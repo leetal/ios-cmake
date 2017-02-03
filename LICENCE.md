@@ -1,5 +1,6 @@
 Copyright (c) 2011-2014, Andrew Fischer <andrew@ltengsoft.com>
-Copyright (c) 2017, Yangqing Jia <widerbergaren@gmail.com>
+
+Copyright (c) 2017, Alexander Widerberg <widerbergaren@gmail.com>
 
 All rights reserved.
 
