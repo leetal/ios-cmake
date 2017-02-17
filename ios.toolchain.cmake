@@ -251,9 +251,9 @@ endif()
 message(STATUS "Version flags set to: ${XCODE_IOS_PLATFORM_VERSION_FLAGS}")
 
 if (ENABLE_BITCODE)
-  set(BITCODE "-fembed-bitcode"
+  set(BITCODE "-fembed-bitcode")
 else()
-  set(BITCODE ""
+  set(BITCODE "")
 endif()
 
 set(CMAKE_C_FLAGS
