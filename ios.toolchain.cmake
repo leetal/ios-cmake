@@ -141,7 +141,7 @@ if (NOT DEFINED IOS_DEPLOYMENT_TARGET)
   # Unless specified, SDK version 8.0 is used by default as minimum target version.
   set(IOS_DEPLOYMENT_TARGET "8.0"
       CACHE STRING "Minimum iOS version to build for." )
-  message(STATUS "Using the default min-version sonce IOS_DEPLOYMENT_TARGET not provided!")
+  message(STATUS "Using the default min-version since IOS_DEPLOYMENT_TARGET not provided!")
 endif()
 # Use bitcode or not
 if (NOT DEFINED ENABLE_BITCODE)
@@ -252,8 +252,10 @@ message(STATUS "Version flags set to: ${XCODE_IOS_PLATFORM_VERSION_FLAGS}")
 
 if (ENABLE_BITCODE)
   set(BITCODE "-fembed-bitcode")
+  message(STATUS "Enabling bitcode support.")
 else()
   set(BITCODE "")
+  message(STATUS "Disabling bitcode support.")
 endif()
 
 set(CMAKE_C_FLAGS
