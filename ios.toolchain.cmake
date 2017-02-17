@@ -53,6 +53,7 @@
 #    being compiled for.  By default this is automatically determined from
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
+# ENABLE_BITCODE: (true|false) Enables or disables bitcode support. Default true
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -135,6 +136,19 @@ if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
   message(FATAL_ERROR "Invalid CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT} "
     "does not exist.")
 endif()
+# Specify minimum version of deployment target.
+if (NOT DEFINED IOS_DEPLOYMENT_TARGET)
+  # Unless specified, SDK version 8.0 is used by default as minimum target version.
+  set(IOS_DEPLOYMENT_TARGET "8.0"
+      CACHE STRING "Minimum iOS version to build for." )
+  message(STATUS "Using the default min-version sonce IOS_DEPLOYMENT_TARGET not provided!")
+endif()
+# Use bitcode or not
+if (NOT DEFINED ENABLE_BITCODE)
+  # Unless specified, enable bitcode support by default
+  set(ENABLE_BITCODE TRUE CACHE BOOL "Wheter or not to enable bitcode")
+  message(STATUS "Enabling bitcode support by default. ENABLE_BITCODE not provided!")
+endif()
 # Get the SDK version information.
 execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
   OUTPUT_VARIABLE IOS_SDK_VERSION
@@ -215,10 +229,6 @@ set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
 set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
 set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
-# Specify minimum version of deployment target.
-# Unless specified, SDK version 8.0 is used by default as minimum target version.
-set(IOS_DEPLOYMENT_TARGET "8.0"
-    CACHE STRING "Minimum iOS version to build for." )
 message(STATUS "Building for minimum iOS version: ${IOS_DEPLOYMENT_TARGET}"
                " (SDK version: ${IOS_SDK_VERSION})")
 # Note that only Xcode 7+ supports the newer more specific:
@@ -240,12 +250,18 @@ else()
 endif()
 message(STATUS "Version flags set to: ${XCODE_IOS_PLATFORM_VERSION_FLAGS}")
 
+if (ENABLE_BITCODE)
+  set(BITCODE "-fembed-bitcode"
+else()
+  set(BITCODE ""
+endif()
+
 set(CMAKE_C_FLAGS
-  "${XCODE_IOS_PLATFORM_VERSION_FLAGS} -fembed-bitcode -fobjc-abi-version=2 -fobjc-arc ${CMAKE_C_FLAGS}")
+"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fobjc-abi-version=2 -fobjc-arc ${CMAKE_C_FLAGS}")
 # Hidden visibilty is required for C++ on iOS.
 set(CMAKE_CXX_FLAGS
-  "${XCODE_IOS_PLATFORM_VERSION_FLAGS} -fembed-bitcode -fvisibility=hidden -fvisibility-inlines-hidden -fobjc-abi-version=2 -fobjc-arc ${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -fomit-frame-pointer -ffast-math -fembed-bitcode ${CMAKE_CXX_FLAGS_RELEASE}")
+  "${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fvisibility=hidden -fvisibility-inlines-hidden -fobjc-abi-version=2 -fobjc-arc ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 -fomit-frame-pointer -ffast-math ${BITCODE} ${CMAKE_CXX_FLAGS_RELEASE}")
 set(CMAKE_C_LINK_FLAGS "${XCODE_IOS_PLATFORM_VERSION_FLAGS} -Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
 set(CMAKE_CXX_LINK_FLAGS "${XCODE_IOS_PLATFORM_VERSION_FLAGS}  -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
 # In order to ensure that the updated compiler flags are used in try_compile()
