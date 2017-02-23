@@ -64,9 +64,10 @@
 #
 # This toolchain defines the following macros for use externally:
 #
-# set_xcode_property (TARGET XCODE_PROPERTY XCODE_VALUE)
-#   A convenience macro for setting xcode specific properties on targets
-#   example: set_xcode_property (myioslib IPHONEOS_DEPLOYMENT_TARGET "3.1").
+# set_xcode_property (TARGET XCODE_PROPERTY XCODE_VALUE XCODE_VARIANT)
+#   A convenience macro for setting xcode specific properties on targets.
+#   Available variants are: All, Release, RelWithDebInfo, Debug, MinSizeRel
+#   example: set_xcode_property (myioslib IPHONEOS_DEPLOYMENT_TARGET "3.1" "all").
 #
 # find_host_package (PROGRAM ARGS)
 #   A macro used to find executable programs on the host system, not within the
@@ -308,9 +309,14 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 # This little macro lets you set any XCode specific property.
-macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
-  set_property(TARGET ${TARGET} PROPERTY
-    XCODE_ATTRIBUTE_${XCODE_PROPERTY} ${XCODE_VALUE})
+macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE XCODE_RELVERSION)
+  if (XCODE_RELVERSION STREQUAL "All")
+    set_property(TARGET ${TARGET} PROPERTY
+    XCODE_ATTRIBUTE_${XCODE_PROPERTY} "${XCODE_VALUE}")
+  else()
+    set_property(TARGET ${TARGET} PROPERTY
+    XCODE_ATTRIBUTE_${XCODE_PROPERTY}[variant=${XCODE_RELVERSION}] "${XCODE_VALUE}")
+  endif()
 endmacro(set_xcode_property)
 # This macro lets you find executable programs on the host system.
 macro(find_host_package)
