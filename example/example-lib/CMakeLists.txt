@@ -25,7 +25,7 @@ ENDIF()
 add_library (example STATIC ${SOURCES} ${HEADERS})
 
 # Debug symbols set in XCode project
-set_xcode_property (example GCC_GENERATE_DEBUGGING_SYMBOLS YES)
+set_xcode_property (example GCC_GENERATE_DEBUGGING_SYMBOLS YES "All")
 
 # Installation
 set (CMAKE_INSTALL_PREFIX "${example-ios_SOURCE_DIR}/../example-app/example-lib")
