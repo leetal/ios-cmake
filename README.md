@@ -9,6 +9,7 @@ Tested with the following combinations:
 * XCode 5.x, iOS SDK 7
 * XCode 6.1.x, iOS SDK 8.1
 * XCode 8.2.x, iOS SDK 10.2
+* XCode 9.0.x, iOS SDK 11.0
 
 # Example usage 
 **NOTE: 64-bit simulator ONLY! Change the `-DIOS_PLATFORM` to applicable value if targeting other platform.**
