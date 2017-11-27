@@ -30,5 +30,11 @@ This will create an XCode project in build directory where the example can be mo
 * Set `-DIOS_PLATFORM` to "SIMULATOR" (example above) to build for iOS simulator 32 bit (i386)
 * Set `-DIOS_PLATFORM` to "SIMULATOR64" to build for iOS simulator 64 bit (x86_64)
 * Set `-DIOS_PLATFORM` to "OS" to build for Device (armv7, armv7s, arm64)
+* Set `-DIOS_PLATFORM` to "TVOS" to build for tvOS (arm64)
+* Set `-DIOS_PLATFORM` to "SIMULATOR_TVOS" to build for tvOS Simulator (x86_64)
 
 __*The resulting binary will be a fat library. To combine all platforms into the same, use the LIPO tool. More information on this is available on the net.*__
+
+## Thanks To
+
+* [![natbro](https://github.com/natbro)](https://github.com/natbro) for adding tvOS support
