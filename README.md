@@ -1,4 +1,4 @@
-A CMake toolchain file for iOS development
+A CMake toolchain file for iOS and tvOS development
 
 ios-cmake
 =========
