@@ -42,10 +42,12 @@
 # Updated by Alex Stewart (alexs.mac@gmail.com).
 # The following variables control the behaviour of this toolchain:
 #
-# IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64
+# IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64 or TVOS or SIMULATOR_TVOS
 #    OS = Build for iPhoneOS.
 #    SIMULATOR = Build for x86 i386 iPhone Simulator.
 #    SIMULATOR64 = Build for x86 x86_64 iPhone Simulator.
+#    TVOS = Build for AppleTVOS.
+#    SIMULATOR_TVOS = Build for x86_64 AppleTV Simulator.
 # CMAKE_OSX_SYSROOT: Path to the iOS SDK to use.  By default this is
 #    automatically determined from IOS_PLATFORM and xcodebuild, but
 #    can also be manually specified (although this should not be required).
@@ -119,6 +121,12 @@ elseif (IOS_PLATFORM STREQUAL "SIMULATOR")
   set(IOS_ARCH i386)
 elseif(IOS_PLATFORM STREQUAL "SIMULATOR64")
   set(XCODE_IOS_PLATFORM iphonesimulator)
+  set(IOS_ARCH x86_64)
+elseif (IOS_PLATFORM STREQUAL "TVOS")
+  set(XCODE_IOS_PLATFORM appletvos)
+  set(IOS_ARCH arm64)
+elseif (IOS_PLATFORM STREQUAL "SIMULATOR_TVOS")
+  set(XCODE_IOS_PLATFORM appletvsimulator)
   set(IOS_ARCH x86_64)
 else()
   message(FATAL_ERROR "Invalid IOS_PLATFORM: ${IOS_PLATFORM}")
@@ -244,6 +252,12 @@ if (IOS_PLATFORM STREQUAL "OS")
     set(XCODE_IOS_PLATFORM_VERSION_FLAGS
       "-m${XCODE_IOS_PLATFORM}-version-min=${IOS_DEPLOYMENT_TARGET}")
   endif()
+elseif (IOS_PLATFORM STREQUAL "TVOS")
+  set(XCODE_IOS_PLATFORM_VERSION_FLAGS
+    "-mtvos-version-min=${IOS_DEPLOYMENT_TARGET}")
+elseif (IOS_PLATFORM STREQUAL "SIMULATOR_TVOS")
+  set(XCODE_IOS_PLATFORM_VERSION_FLAGS
+    "-mtvos-simulator-version-min=${IOS_DEPLOYMENT_TARGET}")
 else()
   # SIMULATOR or SIMULATOR64 both use -mios-simulator-version-min.
   set(XCODE_IOS_PLATFORM_VERSION_FLAGS
