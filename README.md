@@ -42,4 +42,4 @@ __*The resulting binary will be a fat library. To combine all platforms into the
 
 ## Thanks To
 
-* [![natbro](https://github.com/natbro)](https://github.com/natbro) for adding tvOS support
+* [natbro](https://github.com/natbro) for adding tvOS support
