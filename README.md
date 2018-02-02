@@ -35,7 +35,9 @@ This will create an XCode project in build directory where the example can be mo
 
 ### Additional Options
 `-DENABLE_BITCODE=(BOOL)` - Enabled by default, specify FALSE or 0 to disable
+
 `-DENABLE_ARC=(BOOL)` - Enabled by default, specify FALSE or 0 to disable
+
 `-DIOS_ARCH=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64. By default builds for all valid architectures based off `DIOS_PLATFORM` (see above)
 
 __*The resulting binary will be a fat library. To combine all platforms into the same, use the LIPO tool. More information on this is available on the net.*__
