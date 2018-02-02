@@ -39,13 +39,21 @@
 # Platform/UnixPaths.cmake files which are included with CMake 2.8.4
 # It has been altered for iOS development.
 #
-# Updated by Alex Stewart (alexs.mac@gmail.com).
+# Updated by Alex Stewart (alexs.mac@gmail.com)
+#
+# *****************************************************************************
+#      Now maintained by Alexander Widerberg (widerbergaren [at] gmail.com)
+#                      under the BSD-Clause-3 licence
+# *****************************************************************************
+#
+#                           INFORMATION / HELP
+#
 # The following variables control the behaviour of this toolchain:
 #
 # IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64 or TVOS or SIMULATOR_TVOS
 #    OS = Build for iPhoneOS.
 #    SIMULATOR = Build for x86 i386 iPhone Simulator.
-#    SIMULATOR64 = Build for x86 x86_64 iPhone Simulator.
+#    SIMULATOR64 = Build for x86_64 iPhone Simulator.
 #    TVOS = Build for AppleTVOS.
 #    SIMULATOR_TVOS = Build for x86_64 AppleTV Simulator.
 # CMAKE_OSX_SYSROOT: Path to the iOS SDK to use.  By default this is
@@ -55,7 +63,14 @@
 #    being compiled for.  By default this is automatically determined from
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
-# ENABLE_BITCODE: (true|false) Enables or disables bitcode support. Default true
+# ENABLE_BITCODE: (1|0) Enables or disables bitcode support. Default 1 (true)
+# ENABLE_ARC: (1|0) Enables or disables ARC support. Default 1 (true, ARC enabled by default)
+# IOS_ARCH: (armv7 armv7s arm64 i386 x86_64) If specified, will override the default architectures for the given IOS_PLATFORM
+#    OS = armv7 armv7s arm64
+#    SIMULATOR = i386
+#    SIMULATOR64 = x86_64
+#    TVOS = arm64
+#    SIMULATOR_TVOS = x86_64
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -115,19 +130,29 @@ set(IOS_PLATFORM ${IOS_PLATFORM} CACHE STRING
 # from the specified IOS_PLATFORM name.
 if (IOS_PLATFORM STREQUAL "OS")
   set(XCODE_IOS_PLATFORM iphoneos)
-  set(IOS_ARCH armv7 armv7s arm64)
+  if(NOT IOS_ARCH)
+    set(IOS_ARCH armv7 armv7s arm64)
+  endif()
 elseif (IOS_PLATFORM STREQUAL "SIMULATOR")
   set(XCODE_IOS_PLATFORM iphonesimulator)
-  set(IOS_ARCH i386)
+  if(NOT IOS_ARCH)
+    set(IOS_ARCH i386)
+  endif()
 elseif(IOS_PLATFORM STREQUAL "SIMULATOR64")
   set(XCODE_IOS_PLATFORM iphonesimulator)
-  set(IOS_ARCH x86_64)
+  if(NOT IOS_ARCH)
+    set(IOS_ARCH x86_64)
+  endif()
 elseif (IOS_PLATFORM STREQUAL "TVOS")
   set(XCODE_IOS_PLATFORM appletvos)
-  set(IOS_ARCH arm64)
+  if(NOT IOS_ARCH)
+    set(IOS_ARCH arm64)
+  endif()
 elseif (IOS_PLATFORM STREQUAL "SIMULATOR_TVOS")
   set(XCODE_IOS_PLATFORM appletvsimulator)
-  set(IOS_ARCH x86_64)
+  if(NOT IOS_ARCH)
+    set(IOS_ARCH x86_64)
+  endif()
 else()
   message(FATAL_ERROR "Invalid IOS_PLATFORM: ${IOS_PLATFORM}")
 endif()
@@ -157,6 +182,12 @@ if (NOT DEFINED ENABLE_BITCODE)
   # Unless specified, enable bitcode support by default
   set(ENABLE_BITCODE TRUE CACHE BOOL "Wheter or not to enable bitcode")
   message(STATUS "Enabling bitcode support by default. ENABLE_BITCODE not provided!")
+endif()
+# Use ARC or not
+if (NOT DEFINED ENABLE_ARC)
+  # Unless specified, enable ARC support by default
+  set(ENABLE_ARC TRUE CACHE BOOL "Wheter or not to enable ARC")
+  message(STATUS "Enabling ARC support by default. ENABLE_ARC not provided!")
 endif()
 # Get the SDK version information.
 execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
@@ -273,11 +304,19 @@ else()
   message(STATUS "Disabling bitcode support.")
 endif()
 
+if (ENABLE_ARC)
+  set(FOBJC_ARC "-fobjc-arc")
+  message(STATUS "Enabling ARC support.")
+else()
+  set(FOBJC_ARC "-fno-objc-arc")
+  message(STATUS "Disabling ARC support.")
+endif()
+
 set(CMAKE_C_FLAGS
-"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fobjc-abi-version=2 -fobjc-arc ${C_FLAGS}")
+"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fobjc-abi-version=2 ${FOBJC_ARC} ${C_FLAGS}")
 # Hidden visibilty is required for C++ on iOS.
 set(CMAKE_CXX_FLAGS
-"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fvisibility=hidden -fvisibility-inlines-hidden -fobjc-abi-version=2 -fobjc-arc ${CXX_FLAGS}")
+"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fvisibility=hidden -fvisibility-inlines-hidden -fobjc-abi-version=2 ${FOBJC_ARC} ${CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS} -DNDEBUG -Os -fomit-frame-pointer -ffast-math ${BITCODE} ${CXX_FLAGS_MINSIZEREL}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -DNDEBUG -O2 -g -fomit-frame-pointer -ffast-math ${BITCODE} ${CXX_FLAGS_RELWITHDEBINFO}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fomit-frame-pointer -ffast-math ${BITCODE} ${CXX_FLAGS_RELEASE}")
