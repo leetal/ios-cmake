@@ -45,3 +45,7 @@ __*The resulting binary will consist of only one platform. To combine all platfo
 ## Thanks To
 
 * [natbro](https://github.com/natbro) for adding tvOS support
+
+## Notes
+
+Parts of the original toolchain comes from similar project found on code.google.com
