@@ -16,11 +16,6 @@ set (HEADERS
   HelloWorldIOS.h
 )
 
-
-IF (${SIMULATOR})
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mios-simulator-version-min=8.0")
-ENDIF()
-
 # Library
 add_library (example STATIC ${SOURCES} ${HEADERS})
 
