@@ -48,4 +48,4 @@ __*The resulting binary will consist of only one platform. To combine all platfo
 
 ## Notes
 
-Parts of the original toolchain comes from similar project found on code.google.com
+Parts of the original toolchain comes from a similar project found on code.google.com
