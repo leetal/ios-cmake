@@ -43,7 +43,7 @@
 #
 # *****************************************************************************
 #      Now maintained by Alexander Widerberg (widerbergaren [at] gmail.com)
-#                      under the BSD-Clause-3 licence
+#                      under the BSD-3-Clause license
 # *****************************************************************************
 #
 #                           INFORMATION / HELP
@@ -65,6 +65,7 @@
 #    not be required).
 # ENABLE_BITCODE: (1|0) Enables or disables bitcode support. Default 1 (true)
 # ENABLE_ARC: (1|0) Enables or disables ARC support. Default 1 (true, ARC enabled by default)
+# ENABLE_VISIBILITY: (1|0) Enables or disables symbol visibility support. Default 0 (false, visibility hidden by default)
 # IOS_ARCH: (armv7 armv7s arm64 i386 x86_64) If specified, will override the default architectures for the given IOS_PLATFORM
 #    OS = armv7 armv7s arm64
 #    SIMULATOR = i386
@@ -106,7 +107,7 @@ string(REGEX MATCH "Xcode [0-9\\.]+" XCODE_VERSION "${XCODE_VERSION}")
 string(REGEX REPLACE "Xcode ([0-9\\.]+)" "\\1" XCODE_VERSION "${XCODE_VERSION}")
 message(STATUS "Building with Xcode version: ${XCODE_VERSION}")
 # Default to building for iPhoneOS if not specified otherwise, and we cannot
-# determine the platform from the CMAKE_OSX_ARCHITECTURES variable.  The use
+# determine the platform from the CMAKE_OSX_ARCHITECTURES variable. The use
 # of CMAKE_OSX_ARCHITECTURES is such that try_compile() projects can correctly
 # determine the value of IOS_PLATFORM from the root project, as
 # CMAKE_OSX_ARCHITECTURES is propagated to them by CMake.
@@ -178,16 +179,25 @@ if (NOT DEFINED IOS_DEPLOYMENT_TARGET)
   message(STATUS "Using the default min-version since IOS_DEPLOYMENT_TARGET not provided!")
 endif()
 # Use bitcode or not
-if (NOT DEFINED ENABLE_BITCODE)
+if (NOT DEFINED ENABLE_BITCODE AND NOT IOS_ARCH MATCHES "((^|, )(i386|x86_64))+")
   # Unless specified, enable bitcode support by default
-  set(ENABLE_BITCODE TRUE CACHE BOOL "Wheter or not to enable bitcode")
+  set(ENABLE_BITCODE TRUE CACHE BOOL "Whether or not to enable bitcode")
   message(STATUS "Enabling bitcode support by default. ENABLE_BITCODE not provided!")
+endif()
+if (NOT DEFINED ENABLE_BITCODE)
+  message(STATUS "Disabling bitcode support by default on simulators. ENABLE_BITCODE not provided for override!")
 endif()
 # Use ARC or not
 if (NOT DEFINED ENABLE_ARC)
   # Unless specified, enable ARC support by default
-  set(ENABLE_ARC TRUE CACHE BOOL "Wheter or not to enable ARC")
+  set(ENABLE_ARC TRUE CACHE BOOL "Whether or not to enable ARC")
   message(STATUS "Enabling ARC support by default. ENABLE_ARC not provided!")
+endif()
+# Use hidden visibility or not
+if (NOT DEFINED ENABLE_VISIBILITY)
+  # Unless specified, disable symbols visibility by default
+  set(ENABLE_VISIBILITY FALSE CACHE BOOL "Whether or not to hide symbols (-fvisibility=hidden)")
+  message(STATUS "Hiding symbols visibility by default. ENABLE_VISIBILITY not provided!")
 endif()
 # Get the SDK version information.
 execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
@@ -263,12 +273,27 @@ set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
 set(CMAKE_SHARED_MODULE_PREFIX "lib")
 set(CMAKE_SHARED_MODULE_SUFFIX ".so")
+set(CMAKE_C_COMPILER_ABI ELF)
+set(CMAKE_CXX_COMPILER_ABI ELF)
+set(CMAKE_C_HAS_ISYSROOT 1)
+set(CMAKE_CXX_HAS_ISYSROOT 1)
 set(CMAKE_MODULE_EXISTS 1)
 set(CMAKE_DL_LIBS "")
 set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
 set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
 set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
+
+if(IOS_ARCH MATCHES "((^|, )(arm64|x86_64))+")
+  set(CMAKE_C_SIZEOF_DATA_PTR 8)
+  set(CMAKE_CXX_SIZEOF_DATA_PTR 8)
+  message(STATUS "Using a data_ptr size of 8")
+else()
+  set(CMAKE_C_SIZEOF_DATA_PTR 4)
+  set(CMAKE_CXX_SIZEOF_DATA_PTR 4)
+  message(STATUS "Using a data_ptr size of 4")
+endif()
+
 message(STATUS "Building for minimum iOS version: ${IOS_DEPLOYMENT_TARGET}"
                " (SDK version: ${IOS_SDK_VERSION})")
 # Note that only Xcode 7+ supports the newer more specific:
@@ -298,9 +323,11 @@ message(STATUS "Version flags set to: ${XCODE_IOS_PLATFORM_VERSION_FLAGS}")
 
 if (ENABLE_BITCODE)
   set(BITCODE "-fembed-bitcode")
+  set(HEADER_PAD "")
   message(STATUS "Enabling bitcode support.")
 else()
   set(BITCODE "")
+  set(HEADER_PAD "-headerpad_max_install_names")
   message(STATUS "Disabling bitcode support.")
 endif()
 
@@ -312,11 +339,18 @@ else()
   message(STATUS "Disabling ARC support.")
 endif()
 
+if (NOT ENABLE_VISIBILITY)
+  set(VISIBILITY "-fvisibility=hidden")
+  message(STATUS "Hiding symbols (-fvisibility=hidden).")
+else()
+  set(VISIBILITY "")
+endif()
+
 set(CMAKE_C_FLAGS
 "${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fobjc-abi-version=2 ${FOBJC_ARC} ${C_FLAGS}")
 # Hidden visibilty is required for C++ on iOS.
 set(CMAKE_CXX_FLAGS
-"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} -fvisibility=hidden -fvisibility-inlines-hidden -fobjc-abi-version=2 ${FOBJC_ARC} ${CXX_FLAGS}")
+"${XCODE_IOS_PLATFORM_VERSION_FLAGS} ${BITCODE} ${VISIBILITY} -fvisibility-inlines-hidden -fobjc-abi-version=2 ${FOBJC_ARC} ${CXX_FLAGS}")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS} -DNDEBUG -Os -fomit-frame-pointer -ffast-math ${BITCODE} ${CXX_FLAGS_MINSIZEREL}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -DNDEBUG -O2 -g -fomit-frame-pointer -ffast-math ${BITCODE} ${CXX_FLAGS_RELWITHDEBINFO}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -fomit-frame-pointer -ffast-math ${BITCODE} ${CXX_FLAGS_RELEASE}")
@@ -339,11 +373,13 @@ foreach(VAR_TO_FORCE ${VARS_TO_FORCE_IN_CACHE})
 endforeach()
 
 set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)
-set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-dynamiclib -headerpad_max_install_names")
-set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS "-bundle -headerpad_max_install_names")
+set (CMAKE_SHARED_LINKER_FLAGS "-rpath @executable_path/Frameworks -rpath @loader_path/Frameworks")
+set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-dynamiclib ${HEADER_PAD}")
+set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS "-bundle ${HEADER_PAD}")
 set(CMAKE_SHARED_MODULE_LOADER_C_FLAG "-Wl,-bundle_loader,")
 set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
+
 # Hack: if a new cmake (which uses CMAKE_INSTALL_NAME_TOOL) runs on an old
 # build tree (where install_name_tool was hardcoded) and where
 # CMAKE_INSTALL_NAME_TOOL isn't in the cache and still cmake didn't fail in
@@ -353,6 +389,7 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
 if (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
   find_program(CMAKE_INSTALL_NAME_TOOL install_name_tool)
 endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
+
 # Set the find root to the iOS developer roots and to user defined paths.
 set(CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_OSX_SYSROOT}
   ${CMAKE_PREFIX_PATH} CACHE string  "iOS find search path root" FORCE)
