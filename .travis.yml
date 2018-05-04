@@ -5,13 +5,24 @@ matrix:
   include:
     - os: osx
       compiler: clang
-      env: IOS_PLATFORM=SIMULATOR
+      env: 
+        - IOS_PLATFORM=SIMULATOR
+        - BUILD_SHARED=0
     - os: osx
       compiler: clang
-      env: IOS_PLATFORM=SIMULATOR64
+      env: 
+        - IOS_PLATFORM=SIMULATOR64
+        - BUILD_SHARED=0
     - os: osx
       compiler: clang
-      env: IOS_PLATFORM=OS
+      env: 
+        - IOS_PLATFORM=OS
+        - BUILD_SHARED=0
+    - os: osx
+      compiler: clang
+      env: 
+        - IOS_PLATFORM=OS
+        - BUILD_SHARED=1
 
 install: true
 
