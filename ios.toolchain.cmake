@@ -44,6 +44,7 @@
 # *****************************************************************************
 #      Now maintained by Alexander Widerberg (widerbergaren [at] gmail.com)
 #                      under the BSD-3-Clause license
+#                   https://github.com/leetal/ios-cmake
 # *****************************************************************************
 #
 #                           INFORMATION / HELP
