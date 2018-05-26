@@ -265,6 +265,8 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING
   "Must be empty for iOS builds." FORCE)
 # Set the architectures for which to build.
 set(CMAKE_OSX_ARCHITECTURES ${IOS_ARCH} CACHE STRING "Build architecture for iOS")
+# Change the type of target generated for try_compile() so it'll work when cross-compiling
+set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # Skip the platform compiler checks for cross compiling.
 set(CMAKE_CXX_COMPILER_FORCED TRUE)
 set(CMAKE_CXX_COMPILER_WORKS TRUE)
