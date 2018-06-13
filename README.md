@@ -9,7 +9,7 @@ Tested with the following combinations:
 * XCode 5.x, iOS SDK 7
 * XCode 6.1.x, iOS SDK 8.1
 * XCode 8.2.x, iOS SDK 10.2
-* XCode 9.2.x, iOS SDK 11.2
+* XCode 9.4.x, iOS SDK 11.4
 
 # Example usage 
 **NOTE: The below commands will build for 64-bit simulator only. Change the `-DIOS_PLATFORM` to the applicable value if targeting another platform.**
