@@ -169,6 +169,10 @@ if (NOT CMAKE_OSX_SYSROOT)
   message(STATUS "Using SDK: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
 endif()
 if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
+  message(SEND_ERROR "Please make sure that Xcode is installed and that the toolchain"
+    "is pointing to the correct path. Please run:"
+    "sudo xcode-select -s /Applications/Xcode.app/Contents/Developer"
+    "and see if that fixes the problem for you.")
   message(FATAL_ERROR "Invalid CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT} "
     "does not exist.")
 endif()
