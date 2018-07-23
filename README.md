@@ -15,7 +15,7 @@ Tested with the following combinations:
 **NOTE: The below commands will build for 64-bit simulator only. Change the `-DIOS_PLATFORM` to the applicable value if targeting another platform.**
 
 ```bash
-cd example
+cd example/example-lib
 mkdir build
 cd build
 cmake .. -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DIOS_PLATFORM=SIMULATOR64
