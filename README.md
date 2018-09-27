@@ -10,6 +10,7 @@ Tested with the following combinations:
 * XCode 6.1.x, iOS SDK 8.1
 * XCode 8.2.x, iOS SDK 10.2
 * XCode 9.4.x, iOS SDK 11.4
+* XCode 10.0.x, iOS SDK 12.0
 
 # Example usage 
 **NOTE: The below commands will build for 64-bit simulator only. Change the `-DIOS_PLATFORM` to the applicable value if targeting another platform.**
@@ -30,6 +31,7 @@ This will build and install the library for the given IOS_PLATFORM.
 * Set `-DIOS_PLATFORM` to "SIMULATOR" to build for iOS simulator 32 bit (i386)
 * Set `-DIOS_PLATFORM` to "SIMULATOR64" (example above) to build for iOS simulator 64 bit (x86_64)
 * Set `-DIOS_PLATFORM` to "OS" to build for Device (armv7, armv7s, arm64)
+* Set `-DIOS_PLATFORM` to "OS64" to build for Device (arm64 only)
 * Set `-DIOS_PLATFORM` to "TVOS" to build for tvOS (arm64)
 * Set `-DIOS_PLATFORM` to "SIMULATOR_TVOS" to build for tvOS Simulator (x86_64)
 
@@ -47,6 +49,7 @@ __*The resulting binary will consist of only one platform. To combine all platfo
 ## Thanks To
 
 * [natbro](https://github.com/natbro) for adding tvOS support
+* [MSNexploder](https://github.com/MSNexploder) for adding OS64 support
 
 ## Notes
 
