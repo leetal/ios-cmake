@@ -34,6 +34,8 @@ This will build and install the library for the given IOS_PLATFORM.
 * Set `-DIOS_PLATFORM` to "OS64" to build for Device (arm64 only)
 * Set `-DIOS_PLATFORM` to "TVOS" to build for tvOS (arm64)
 * Set `-DIOS_PLATFORM` to "SIMULATOR_TVOS" to build for tvOS Simulator (x86_64)
+* Set `-DIOS_PLATFORM` to "WATCHOS" to build for watchOS (armv7k)
+* Set `-DIOS_PLATFORM` to "SIMULATOR_WATCHOS" to build for watchOS Simulator (i386)
 
 ### Additional Options
 `-DENABLE_BITCODE=(BOOL)` - Enabled by default, specify FALSE or 0 to disable bitcode
@@ -42,7 +44,7 @@ This will build and install the library for the given IOS_PLATFORM.
 
 `-DENABLE_VISIBILITY=(BOOL)` - Disabled by default, specify TRUE or 1 to enable symbol visibility support
 
-`-DIOS_ARCH=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64. By default it will build for all valid architectures based on `-DIOS_PLATFORM` (see above)
+`-DIOS_ARCH=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DIOS_PLATFORM` (see above)
 
 __*The resulting binary will consist of only one platform. To combine all platforms into the same fat-library, use the LIPO tool. More information on this is available on the net.*__
 
