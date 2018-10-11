@@ -1,4 +1,4 @@
-A CMake toolchain file for iOS and tvOS development
+A CMake toolchain file for iOS, watchOS and tvOS development with full simulator support and toggable options!
 
 ios-cmake
 =========
