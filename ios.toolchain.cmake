@@ -182,22 +182,28 @@ endif()
 message(STATUS "Configuring iOS build for platform: ${IOS_PLATFORM}, "
   "architecture(s): ${IOS_ARCH}")
 # If user did not specify the SDK root to use, then query xcodebuild for it.
-if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
+execute_process(COMMAND xcodebuild -version -sdk ${XCODE_IOS_PLATFORM} Path
+    OUTPUT_VARIABLE CMAKE_OSX_SYSROOT_INT
+     OUTPUT_QUIET ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+# If user did not specify the SDK root to use, then query xcodebuild for it.
+if (NOT DEFINED CMAKE_OSX_SYSROOT OR (NOT CMAKE_OSX_SYSROOT STREQUAL CMAKE_OSX_SYSROOT_INT))
   execute_process(COMMAND xcodebuild -version -sdk ${XCODE_IOS_PLATFORM} Path
     OUTPUT_VARIABLE CMAKE_OSX_SYSROOT
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE)
-    
-    if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
-      message(SEND_ERROR "Please make sure that Xcode is installed and that the toolchain"
-      "is pointing to the correct path. Please run:"
-      "sudo xcode-select -s /Applications/Xcode.app/Contents/Developer"
-      "and see if that fixes the problem for you.")
-      message(FATAL_ERROR "Invalid CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT} "
-      "does not exist.")
-    else()
-       message(STATUS "Using SDK: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
-    endif()
+elseif(DEFINED CMAKE_OSX_SYSROOT)
+  message(STATUS "Using manually set SDK path: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
+endif()
+if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
+  message(SEND_ERROR "Please make sure that Xcode is installed and that the toolchain"
+  "is pointing to the correct path. Please run:"
+  "sudo xcode-select -s /Applications/Xcode.app/Contents/Developer"
+  "and see if that fixes the problem for you.")
+  message(FATAL_ERROR "Invalid CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT} "
+  "does not exist.")
+else()
+   message(STATUS "Using SDK: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
 endif()
 # Specify minimum version of deployment target.
 if (NOT DEFINED IOS_DEPLOYMENT_TARGET)
@@ -405,7 +411,7 @@ list(APPEND VARS_TO_FORCE_IN_CACHE
   CMAKE_C_LINK_FLAGS
   CMAKE_CXX_LINK_FLAGS)
 foreach(VAR_TO_FORCE ${VARS_TO_FORCE_IN_CACHE})
-  set(${VAR_TO_FORCE} "${${VAR_TO_FORCE}}" CACHE STRING "" FORCE)
+  set(${VAR_TO_FORCE} "${${VAR_TO_FORCE}}" CACHE STRING "")
 endforeach()
 
 set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)
