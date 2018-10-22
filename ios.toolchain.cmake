@@ -192,8 +192,6 @@ if (NOT DEFINED CMAKE_OSX_SYSROOT OR (NOT CMAKE_OSX_SYSROOT STREQUAL CMAKE_OSX_S
     OUTPUT_VARIABLE CMAKE_OSX_SYSROOT
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE)
-elseif(DEFINED CMAKE_OSX_SYSROOT)
-  message(STATUS "Using manually set SDK path: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
 endif()
 if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
   message(SEND_ERROR "Please make sure that Xcode is installed and that the toolchain"
@@ -202,6 +200,8 @@ if (NOT EXISTS ${CMAKE_OSX_SYSROOT})
   "and see if that fixes the problem for you.")
   message(FATAL_ERROR "Invalid CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT} "
   "does not exist.")
+elseif(DEFINED CMAKE_OSX_SYSROOT)
+  message(STATUS "Using manually set SDK path: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
 else()
    message(STATUS "Using SDK: ${CMAKE_OSX_SYSROOT} for platform: ${IOS_PLATFORM}")
 endif()
