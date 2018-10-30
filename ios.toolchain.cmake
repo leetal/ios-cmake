@@ -53,6 +53,7 @@
 #
 # IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64 or TVOS or SIMULATOR_TVOS or WATCHOS
 #    OS = Build for iPhoneOS.
+#    OS64 = Build for arm64 iPhoneOS.
 #    SIMULATOR = Build for x86 i386 iPhone Simulator.
 #    SIMULATOR64 = Build for x86_64 iPhone Simulator.
 #    TVOS = Build for AppleTVOS.
@@ -70,7 +71,8 @@
 # ENABLE_ARC: (1|0) Enables or disables ARC support. Default 1 (true, ARC enabled by default)
 # ENABLE_VISIBILITY: (1|0) Enables or disables symbol visibility support. Default 0 (false, visibility hidden by default)
 # IOS_ARCH: (armv7 armv7s arm64 i386 x86_64) If specified, will override the default architectures for the given IOS_PLATFORM
-#    OS = armv7 armv7s arm64
+#    OS = armv7 armv7s arm64 arm64e
+#    OS64 = arm64 arm64e
 #    SIMULATOR = i386
 #    SIMULATOR64 = x86_64
 #    TVOS = arm64
@@ -139,12 +141,12 @@ set(IOS_PLATFORM ${IOS_PLATFORM} CACHE STRING
 if (IOS_PLATFORM STREQUAL "OS")
   set(XCODE_IOS_PLATFORM iphoneos)
   if(NOT IOS_ARCH)
-    set(IOS_ARCH armv7 armv7s arm64)
+    set(IOS_ARCH armv7 armv7s arm64 arm64e)
   endif()
  elseif (IOS_PLATFORM STREQUAL "OS64")
   set(XCODE_IOS_PLATFORM iphoneos)
   if(NOT IOS_ARCH)
-    set(IOS_ARCH arm64)
+    set(IOS_ARCH arm64 arm64e)
   endif()
 elseif (IOS_PLATFORM STREQUAL "SIMULATOR")
   set(XCODE_IOS_PLATFORM iphonesimulator)
