@@ -51,7 +51,7 @@ __*The resulting binary will consist of only one platform. To combine all platfo
 ## Thanks To
 
 * [natbro](https://github.com/natbro) for adding tvOS support
-* [MSNexploder](https://github.com/MSNexploder) for adding OS64 support
+* [MSNexploder](https://github.com/MSNexploder) for adding OS64 and arm64e support
 * [garryyan](https://github.com/garryyan) for adding watchOS support
 
 ## Notes
