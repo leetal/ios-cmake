@@ -330,7 +330,7 @@ set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
 set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
 
-if(IOS_ARCH MATCHES "((^|, )(arm64|x86_64))+")
+if(IOS_ARCH MATCHES "((^|, )(arm64|arm64e|x86_64))+")
   set(CMAKE_C_SIZEOF_DATA_PTR 8)
   set(CMAKE_CXX_SIZEOF_DATA_PTR 8)
   message(STATUS "Using a data_ptr size of 8")
@@ -345,7 +345,7 @@ message(STATUS "Building for minimum iOS version: ${IOS_DEPLOYMENT_TARGET}"
 # Note that only Xcode 7+ supports the newer more specific:
 # -m${XCODE_IOS_PLATFORM}-version-min flags, older versions of Xcode use:
 # -m(ios/ios-simulator)-version-min instead.
-if (IOS_PLATFORM STREQUAL "OS")
+if (IOS_PLATFORM STREQUAL "OS" OR IOS_PLATFORM STREQUAL "OS64")
   if (XCODE_VERSION VERSION_LESS 7.0)
     set(XCODE_IOS_PLATFORM_VERSION_FLAGS
       "-mios-version-min=${IOS_DEPLOYMENT_TARGET}")
