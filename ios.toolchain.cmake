@@ -53,12 +53,12 @@
 #
 # IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64 or TVOS or SIMULATOR_TVOS or WATCHOS or SIMULATOR_WATCHOS
 #    OS = Build for iPhoneOS.
-#    OS64 = Build for arm64 iPhoneOS.
+#    OS64 = Build for arm64 arm64e iPhoneOS.
 #    SIMULATOR = Build for x86 i386 iPhone Simulator.
 #    SIMULATOR64 = Build for x86_64 iPhone Simulator.
 #    TVOS = Build for AppleTVOS.
 #    SIMULATOR_TVOS = Build for x86_64 AppleTV Simulator.
-#    WATCHOS = Build for armv7k for WatchOS.
+#    WATCHOS = Build for armv7k arm64_32 for WatchOS.
 #    SIMULATOR_WATCHOS = Build for x86_64 for Watch Simulator.
 # CMAKE_OSX_SYSROOT: Path to the iOS SDK to use.  By default this is
 #    automatically determined from IOS_PLATFORM and xcodebuild, but
@@ -71,13 +71,13 @@
 # ENABLE_ARC: (1|0) Enables or disables ARC support. Default 1 (true, ARC enabled by default)
 # ENABLE_VISIBILITY: (1|0) Enables or disables symbol visibility support. Default 0 (false, visibility hidden by default)
 # IOS_ARCH: (armv7 armv7s armv7k arm64 arm64e arm64_32 i386 x86_64) If specified, will override the default architectures for the given IOS_PLATFORM
-#    OS = armv7 armv7s arm64 + arm64e (if applicable)
-#    OS64 = arm64 + arm64e (if applicable)
+#    OS = armv7 armv7s arm64 arm64e (if applicable)
+#    OS64 = arm64 arm64e (if applicable)
 #    SIMULATOR = i386
 #    SIMULATOR64 = x86_64
 #    TVOS = arm64
 #    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
-#    WATCHOS = armv7k + arm64_32 (if applicable)
+#    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
 #
 # This toolchain defines the following variables for use externally:
@@ -161,6 +161,7 @@ elseif (IOS_PLATFORM STREQUAL "SIMULATOR")
   if(NOT IOS_ARCH)
     set(IOS_ARCH i386)
   endif()
+  message(WARNING "SIMULATOR IS DEPRECATED. Consider using SIMULATOR64 instead.")
 elseif(IOS_PLATFORM STREQUAL "SIMULATOR64")
   set(XCODE_IOS_PLATFORM iphonesimulator)
   if(NOT IOS_ARCH)
