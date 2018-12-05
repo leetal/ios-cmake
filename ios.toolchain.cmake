@@ -51,7 +51,7 @@
 #
 # The following variables control the behaviour of this toolchain:
 #
-# IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64 or TVOS or SIMULATOR_TVOS or WATCHOS
+# IOS_PLATFORM: OS (default) or SIMULATOR or SIMULATOR64 or TVOS or SIMULATOR_TVOS or WATCHOS or SIMULATOR_WATCHOS
 #    OS = Build for iPhoneOS.
 #    OS64 = Build for arm64 iPhoneOS.
 #    SIMULATOR = Build for x86 i386 iPhone Simulator.
@@ -59,7 +59,7 @@
 #    TVOS = Build for AppleTVOS.
 #    SIMULATOR_TVOS = Build for x86_64 AppleTV Simulator.
 #    WATCHOS = Build for armv7k for WatchOS.
-#    SIMULATOR_WATCHOS = Build for i386 for Watch Simulator.
+#    SIMULATOR_WATCHOS = Build for x86_64 for Watch Simulator.
 # CMAKE_OSX_SYSROOT: Path to the iOS SDK to use.  By default this is
 #    automatically determined from IOS_PLATFORM and xcodebuild, but
 #    can also be manually specified (although this should not be required).
@@ -70,15 +70,15 @@
 # ENABLE_BITCODE: (1|0) Enables or disables bitcode support. Default 1 (true)
 # ENABLE_ARC: (1|0) Enables or disables ARC support. Default 1 (true, ARC enabled by default)
 # ENABLE_VISIBILITY: (1|0) Enables or disables symbol visibility support. Default 0 (false, visibility hidden by default)
-# IOS_ARCH: (armv7 armv7s arm64 i386 x86_64) If specified, will override the default architectures for the given IOS_PLATFORM
-#    OS = armv7 armv7s arm64 arm64e
-#    OS64 = arm64 arm64e
+# IOS_ARCH: (armv7 armv7s armv7k arm64 arm64e arm64_32 i386 x86_64) If specified, will override the default architectures for the given IOS_PLATFORM
+#    OS = armv7 armv7s arm64 + arm64e (if applicable)
+#    OS64 = arm64 + arm64e (if applicable)
 #    SIMULATOR = i386
 #    SIMULATOR64 = x86_64
 #    TVOS = arm64
-#    SIMULATOR_TVOS = x86_64
-#    WATCHOS = armv7k
-#    SIMULATOR_WATCHOS = i386
+#    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
+#    WATCHOS = armv7k + arm64_32 (if applicable)
+#    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -179,12 +179,16 @@ elseif (IOS_PLATFORM STREQUAL "SIMULATOR_TVOS")
 elseif (IOS_PLATFORM STREQUAL "WATCHOS")
   set(XCODE_IOS_PLATFORM watchos)
   if(NOT IOS_ARCH)
-    set(IOS_ARCH armv7k)
+    if (XCODE_VERSION VERSION_GREATER 10.0)
+      set(IOS_ARCH armv7k arm64_32)
+    else()
+      set(IOS_ARCH armv7k)
+    endif()
   endif()
 elseif (IOS_PLATFORM STREQUAL "SIMULATOR_WATCHOS")
-  set(XCODE_IOS_PLATFORM  watchsimulator)
+  set(XCODE_IOS_PLATFORM watchsimulator)
   if(NOT IOS_ARCH)
-    set(IOS_ARCH i386)
+    set(IOS_ARCH x86_64)
   endif()
 else()
   message(FATAL_ERROR "Invalid IOS_PLATFORM: ${IOS_PLATFORM}")
@@ -217,9 +221,15 @@ else()
 endif()
 # Specify minimum version of deployment target.
 if (NOT DEFINED IOS_DEPLOYMENT_TARGET)
-  # Unless specified, SDK version 8.0 is used by default as minimum target version.
-  set(IOS_DEPLOYMENT_TARGET "8.0"
-      CACHE STRING "Minimum iOS version to build for." )
+  if (IOS_PLATFORM STREQUAL "WATCHOS" OR IOS_PLATFORM STREQUAL "SIMULATOR_WATCHOS")
+    # Unless specified, SDK version 2.0 is used by default as minimum target version (watchOS).
+    set(IOS_DEPLOYMENT_TARGET "2.0"
+            CACHE STRING "Minimum iOS version to build for." )
+  else()
+    # Unless specified, SDK version 8.0 is used by default as minimum target version (iOS, tvOS).
+    set(IOS_DEPLOYMENT_TARGET "8.0"
+            CACHE STRING "Minimum iOS version to build for." )
+  endif()
   message(STATUS "Using the default min-version since IOS_DEPLOYMENT_TARGET not provided!")
 endif()
 # Use bitcode or not
