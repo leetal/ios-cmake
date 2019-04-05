@@ -15,6 +15,6 @@ fi
 
 cmake .. \
     $GENERATOR_EXT -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DIOS_PLATFORM=$IOS_PLATFORM $SHARED_EXT\
+    -DPLATFORM=$IOS_PLATFORM $SHARED_EXT\
     || exit 1
 cmake --build . --config Release --target install || exit 1
