@@ -52,7 +52,6 @@ matrix:
         - IOS_PLATFORM=WATCHOS
         - BUILD_SHARED=0
         - USE_XCODE=0
-  allow_failures:
     - os: osx
       osx_image: xcode10.2
       compiler: clang

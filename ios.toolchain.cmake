@@ -53,8 +53,8 @@
 #
 # PLATFORM: (default "OS")
 #    OS = Build for iPhoneOS.
-#    OS64 = Build for arm64 arm64e iphoneOS.
-#    OS64COMBINED = Build for arm64 arm64e x86_64 iphoneOS. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
+#    OS64 = Build for arm64 iphoneOS.
+#    OS64COMBINED = Build for arm64 x86_64 iphoneOS. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
 #    SIMULATOR = Build for x86 i386 iphoneOS Simulator.
 #    SIMULATOR64 = Build for x86_64 iphoneOS Simulator.
 #    TVOS = Build for arm64 tvOS.
@@ -81,9 +81,9 @@
 #
 # ENABLE_VISIBILITY: (1|0) Enables or disables symbol visibility support. Default 0 (false, visibility hidden by default)
 #
-# IOS_ARCH: (armv7 armv7s armv7k arm64 arm64e arm64_32 i386 x86_64) If specified, will override the default architectures for the given PLATFORM
-#    OS = armv7 armv7s arm64 arm64e (if applicable)
-#    OS64 = arm64 arm64e (if applicable)
+# IOS_ARCH: (armv7 armv7s armv7k arm64 arm64_32 i386 x86_64) If specified, will override the default architectures for the given PLATFORM
+#    OS = armv7 armv7s arm64 (if applicable)
+#    OS64 = arm64 (if applicable)
 #    SIMULATOR = i386
 #    SIMULATOR64 = x86_64
 #    TVOS = arm64
@@ -174,7 +174,7 @@ if(PLATFORM_INT STREQUAL "OS")
   set(SDK_NAME iphoneos)
   if(NOT IOS_ARCH)
     if (XCODE_VERSION VERSION_GREATER 10.0)
-      set(IOS_ARCH armv7 armv7s arm64 arm64e)
+      set(IOS_ARCH armv7 armv7s arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
     else()
       set(IOS_ARCH armv7 armv7s arm64)
     endif()
@@ -183,7 +183,7 @@ elseif(PLATFORM_INT STREQUAL "OS64")
   set(SDK_NAME iphoneos)
   if(NOT IOS_ARCH)
     if (XCODE_VERSION VERSION_GREATER 10.0)
-      set(IOS_ARCH arm64 arm64e)
+      set(IOS_ARCH arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
     else()
       set(IOS_ARCH arm64)
     endif()
@@ -193,7 +193,7 @@ elseif(PLATFORM_INT STREQUAL "OS64COMBINED")
   if(MODERN_CMAKE)
     if(NOT IOS_ARCH)
       if (XCODE_VERSION VERSION_GREATER 10.0)
-        set(IOS_ARCH arm64 arm64e x86_64)
+        set(IOS_ARCH arm64 x86_64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
       else()
         set(IOS_ARCH arm64 x86_64)
       endif()
@@ -478,7 +478,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET ${IOS_DEPLOYMENT_TARGET} CACHE STRING
 if(ENABLE_BITCODE_INT)
   set(BITCODE "-fembed-bitcode")
   set(HEADER_PAD "")
-  set(CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE YES CACHE INTERNAL "")
+  set(CMAKE_XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE bitcode CACHE INTERNAL "")
   message(STATUS "Enabling bitcode support.")
 else()
   set(BITCODE "")
