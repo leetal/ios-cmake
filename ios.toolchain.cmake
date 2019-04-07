@@ -174,7 +174,7 @@ if(PLATFORM_INT STREQUAL "OS")
   set(SDK_NAME iphoneos)
   if(NOT IOS_ARCH)
     if (XCODE_VERSION VERSION_GREATER 10.0)
-      set(IOS_ARCH armv7 armv7s arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
+      set(IOS_ARCH armv7 armv7s arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
     else()
       set(IOS_ARCH armv7 armv7s arm64)
     endif()
@@ -183,7 +183,7 @@ elseif(PLATFORM_INT STREQUAL "OS64")
   set(SDK_NAME iphoneos)
   if(NOT IOS_ARCH)
     if (XCODE_VERSION VERSION_GREATER 10.0)
-      set(IOS_ARCH arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
+      set(IOS_ARCH arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
     else()
       set(IOS_ARCH arm64)
     endif()
@@ -193,7 +193,7 @@ elseif(PLATFORM_INT STREQUAL "OS64COMBINED")
   if(MODERN_CMAKE)
     if(NOT IOS_ARCH)
       if (XCODE_VERSION VERSION_GREATER 10.0)
-        set(IOS_ARCH arm64 x86_64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
+        set(IOS_ARCH arm64 x86_64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
       else()
         set(IOS_ARCH arm64 x86_64)
       endif()
