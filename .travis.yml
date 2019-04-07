@@ -4,30 +4,61 @@ matrix:
   fast_finish: true
   include:
     - os: osx
+      osx_image: xcode10.2
       compiler: clang
       env: 
         - IOS_PLATFORM=SIMULATOR
         - BUILD_SHARED=0
+        - USE_XCODE=0
     - os: osx
+      osx_image: xcode10.2
       compiler: clang
       env: 
         - IOS_PLATFORM=SIMULATOR64
         - BUILD_SHARED=0
+        - USE_XCODE=0
     - os: osx
+      osx_image: xcode10.2
       compiler: clang
       env: 
         - IOS_PLATFORM=OS
         - BUILD_SHARED=0
+        - USE_XCODE=0
     - os: osx
+      osx_image: xcode10.2
       compiler: clang
       env: 
         - IOS_PLATFORM=OS64
         - BUILD_SHARED=0
+        - USE_XCODE=0
     - os: osx
+      osx_image: xcode10.2
       compiler: clang
       env: 
         - IOS_PLATFORM=OS
         - BUILD_SHARED=1
+        - USE_XCODE=0
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env:
+        - IOS_PLATFORM=TVOS
+        - BUILD_SHARED=0
+        - USE_XCODE=0
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env:
+        - IOS_PLATFORM=WATCHOS
+        - BUILD_SHARED=0
+        - USE_XCODE=0
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env:
+        - IOS_PLATFORM=OS64COMBINED
+        - BUILD_SHARED=0
+        - USE_XCODE=1
 
 install: true
 
