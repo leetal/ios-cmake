@@ -75,6 +75,8 @@
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
 #
+# DEPLOYMENT_TARGET: Minimum SDK version to target. Default 2.0 on watchOS and 9.0 on tvOS+iOS
+#
 # ENABLE_BITCODE: (1|0) Enables or disables bitcode support. Default 1 (true)
 #
 # ENABLE_ARC: (1|0) Enables or disables ARC support. Default 1 (true, ARC enabled by default)
@@ -295,18 +297,22 @@ if(USED_CMAKE_GENERATOR MATCHES "Xcode")
   endif()
 endif()
 
+if(DEFINED IOS_DEPLOYMENT_TARGET)
+  set(DEPLOYMENT_TARGET ${IOS_DEPLOYMENT_TARGET})
+endif()
+
 # Specify minimum version of deployment target.
-if(NOT DEFINED IOS_DEPLOYMENT_TARGET)
+if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM_INT STREQUAL "WATCHOS" OR PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
     # Unless specified, SDK version 2.0 is used by default as minimum target version (watchOS).
-    set(IOS_DEPLOYMENT_TARGET "2.0"
+    set(DEPLOYMENT_TARGET "2.0"
             CACHE STRING "Minimum iOS version to build for." )
   else()
-    # Unless specified, SDK version 8.0 is used by default as minimum target version (iOS, tvOS).
-    set(IOS_DEPLOYMENT_TARGET "8.0"
+    # Unless specified, SDK version 9.0 is used by default as minimum target version (iOS, tvOS).
+    set(DEPLOYMENT_TARGET "9.0"
             CACHE STRING "Minimum iOS version to build for." )
   endif()
-  message(STATUS "Using the default min-version since IOS_DEPLOYMENT_TARGET not provided!")
+  message(STATUS "Using the default min-version since DEPLOYMENT_TARGET not provided!")
 endif()
 # Use bitcode or not
 if(NOT DEFINED ENABLE_BITCODE AND NOT IOS_ARCH MATCHES "((^|, )(i386|x86_64))+")
@@ -440,7 +446,7 @@ else()
   message(STATUS "Using a data_ptr size of 4")
 endif()
 
-message(STATUS "Building for minimum iOS version: ${IOS_DEPLOYMENT_TARGET}"
+message(STATUS "Building for minimum iOS version: ${DEPLOYMENT_TARGET}"
                " (SDK version: ${SDK_VERSION})")
 # Note that only Xcode 7+ supports the newer more specific:
 # -m${SDK_NAME}-version-min flags, older versions of Xcode use:
@@ -448,31 +454,31 @@ message(STATUS "Building for minimum iOS version: ${IOS_DEPLOYMENT_TARGET}"
 if(PLATFORM_INT STREQUAL "OS" OR PLATFORM_INT STREQUAL "OS64")
   if(XCODE_VERSION VERSION_LESS 7.0)
     set(SDK_NAME_VERSION_FLAGS
-      "-mios-version-min=${IOS_DEPLOYMENT_TARGET}")
+      "-mios-version-min=${DEPLOYMENT_TARGET}")
   else()
     # Xcode 7.0+ uses flags we can build directly from SDK_NAME.
     set(SDK_NAME_VERSION_FLAGS
-      "-m${SDK_NAME}-version-min=${IOS_DEPLOYMENT_TARGET}")
+      "-m${SDK_NAME}-version-min=${DEPLOYMENT_TARGET}")
   endif()
 elseif(PLATFORM_INT STREQUAL "TVOS")
   set(SDK_NAME_VERSION_FLAGS
-    "-mtvos-version-min=${IOS_DEPLOYMENT_TARGET}")
+    "-mtvos-version-min=${DEPLOYMENT_TARGET}")
 elseif(PLATFORM_INT STREQUAL "SIMULATOR_TVOS")
   set(SDK_NAME_VERSION_FLAGS
-    "-mtvos-simulator-version-min=${IOS_DEPLOYMENT_TARGET}")
+    "-mtvos-simulator-version-min=${DEPLOYMENT_TARGET}")
 elseif(PLATFORM_INT STREQUAL "WATCHOS")
   set(SDK_NAME_VERSION_FLAGS
-    "-mwatchos-version-min=${IOS_DEPLOYMENT_TARGET}")
+    "-mwatchos-version-min=${DEPLOYMENT_TARGET}")
 elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
   set(SDK_NAME_VERSION_FLAGS
-    "-mwatchos-simulator-version-min=${IOS_DEPLOYMENT_TARGET}")
+    "-mwatchos-simulator-version-min=${DEPLOYMENT_TARGET}")
 else()
   # SIMULATOR or SIMULATOR64 both use -mios-simulator-version-min.
   set(SDK_NAME_VERSION_FLAGS
-    "-mios-simulator-version-min=${IOS_DEPLOYMENT_TARGET}")
+    "-mios-simulator-version-min=${DEPLOYMENT_TARGET}")
 endif()
 message(STATUS "Version flags set to: ${SDK_NAME_VERSION_FLAGS}")
-set(CMAKE_OSX_DEPLOYMENT_TARGET ${IOS_DEPLOYMENT_TARGET} CACHE STRING
+set(CMAKE_OSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET} CACHE STRING
     "Set CMake deployment target" FORCE)
 
 if(ENABLE_BITCODE_INT)
