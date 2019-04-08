@@ -64,13 +64,11 @@
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
 #
-# IOS_PLATFORM: (Deprecated) Alias to PLATFORM
-#
 # CMAKE_OSX_SYSROOT: Path to the iOS SDK to use.  By default this is
 #    automatically determined from IOS_PLATFORM and xcodebuild, but
 #    can also be manually specified (although this should not be required).
 #
-# CMAKE_IOS_DEVELOPER_ROOT: Path to the Developer directory for the iOS platform
+# CMAKE_DEVELOPER_ROOT: Path to the Developer directory for the iOS platform
 #    being compiled for.  By default this is automatically determined from
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
@@ -111,6 +109,15 @@
 #   A macro used to find executable programs on the host system, not within the
 #   iOS environment.  Thanks to the android-cmake project for providing the
 #   command.
+#
+# ******************************** DEPRECATIONS *******************************
+#
+# IOS_DEPLOYMENT_TARGET: (Deprecated) Alias to DEPLOYMENT_TARGET
+# CMAKE_IOS_DEVELOPER_ROOT: (Deprecated) Alias to CMAKE_DEVELOPER_ROOT
+# IOS_PLATFORM: (Deprecated) Alias to PLATFORM
+#
+# *****************************************************************************
+#
 
 # Fix for PThread library not in path
 set(CMAKE_THREAD_LIBS_INIT "-lpthread")
@@ -135,10 +142,24 @@ string(REGEX MATCH "Xcode [0-9\\.]+" XCODE_VERSION "${XCODE_VERSION}")
 string(REGEX REPLACE "Xcode ([0-9\\.]+)" "\\1" XCODE_VERSION "${XCODE_VERSION}")
 message(STATUS "Building with Xcode version: ${XCODE_VERSION}")
 
+######## ALIASES (DEPRECATION WARNINGS)
+
 if(DEFINED IOS_PLATFORM)
   set(PLATFORM ${IOS_PLATFORM})
   message(DEPRECATION "IOS_PLATFORM argument is DEPRECATED. Consider using the new PLATFORM argument instead.")
 endif()
+
+if(DEFINED IOS_DEPLOYMENT_TARGET)
+  set(DEPLOYMENT_TARGET ${IOS_DEPLOYMENT_TARGET})
+  message(DEPRECATION "CMAKE_IOS_DEVELOPER_ROOT argument is DEPRECATED. Consider using the new CMAKE_DEVELOPER_ROOT argument instead.")
+endif()
+
+if(DEFINED CMAKE_IOS_DEVELOPER_ROOT)
+  set(CMAKE_DEVELOPER_ROOT ${CMAKE_IOS_DEVELOPER_ROOT})
+  message(DEPRECATION "CMAKE_IOS_DEVELOPER_ROOT argument is DEPRECATED. Consider using the new CMAKE_DEVELOPER_ROOT argument instead.")
+endif()
+
+######## END ALIASES
 
 # Default to building for iPhoneOS if not specified otherwise, and we cannot
 # determine the platform from the CMAKE_OSX_ARCHITECTURES variable. The use
@@ -297,20 +318,16 @@ if(USED_CMAKE_GENERATOR MATCHES "Xcode")
   endif()
 endif()
 
-if(DEFINED IOS_DEPLOYMENT_TARGET)
-  set(DEPLOYMENT_TARGET ${IOS_DEPLOYMENT_TARGET})
-endif()
-
 # Specify minimum version of deployment target.
 if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM_INT STREQUAL "WATCHOS" OR PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
     # Unless specified, SDK version 2.0 is used by default as minimum target version (watchOS).
     set(DEPLOYMENT_TARGET "2.0"
-            CACHE STRING "Minimum iOS version to build for." )
+            CACHE STRING "Minimum SDK version to build for." )
   else()
     # Unless specified, SDK version 9.0 is used by default as minimum target version (iOS, tvOS).
     set(DEPLOYMENT_TARGET "9.0"
-            CACHE STRING "Minimum iOS version to build for." )
+            CACHE STRING "Minimum SDK version to build for." )
   endif()
   message(STATUS "Using the default min-version since DEPLOYMENT_TARGET not provided!")
 endif()
@@ -343,17 +360,18 @@ execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
   OUTPUT_VARIABLE SDK_VERSION
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 # Find the Developer root for the specific iOS platform being compiled for
 # from CMAKE_OSX_SYSROOT.  Should be ../../ from SDK specified in
 # CMAKE_OSX_SYSROOT. There does not appear to be a direct way to obtain
 # this information from xcrun or xcodebuild.
-if (NOT CMAKE_IOS_DEVELOPER_ROOT AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode")
+if (NOT DEFINED CMAKE_DEVELOPER_ROOT AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode")
   get_filename_component(IOS_PLATFORM_SDK_DIR ${CMAKE_OSX_SYSROOT} PATH)
-  get_filename_component(CMAKE_IOS_DEVELOPER_ROOT ${IOS_PLATFORM_SDK_DIR} PATH)
+  get_filename_component(CMAKE_DEVELOPER_ROOT ${IOS_PLATFORM_SDK_DIR} PATH)
 
-  if (NOT DEFINED CMAKE_IOS_DEVELOPER_ROOT)
-    message(FATAL_ERROR "Invalid CMAKE_IOS_DEVELOPER_ROOT: "
-      "${CMAKE_IOS_DEVELOPER_ROOT} does not exist.")
+  if (NOT DEFINED CMAKE_DEVELOPER_ROOT)
+    message(FATAL_ERROR "Invalid CMAKE_DEVELOPER_ROOT: "
+      "${CMAKE_DEVELOPER_ROOT} does not exist.")
   endif()
 endif()
 # Find the C & C++ compilers for the specified SDK.
@@ -373,17 +391,17 @@ if(NOT CMAKE_CXX_COMPILER)
 endif()
 # Find (Apple's) libtool.
 execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT} -find libtool
-  OUTPUT_VARIABLE IOS_LIBTOOL
+  OUTPUT_VARIABLE BUILD_LIBTOOL
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
-message(STATUS "Using libtool: ${IOS_LIBTOOL}")
+message(STATUS "Using libtool: ${BUILD_LIBTOOL}")
 # Configure libtool to be used instead of ar + ranlib to build static libraries.
 # This is required on Xcode 7+, but should also work on previous versions of
 # Xcode.
 set(CMAKE_C_CREATE_STATIC_LIBRARY
-  "${IOS_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
+  "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
 set(CMAKE_CXX_CREATE_STATIC_LIBRARY
-  "${IOS_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
+  "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
 # Get the version of Darwin (OS X) of the host.
 execute_process(COMMAND uname -r
   OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION
@@ -564,7 +582,7 @@ if(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
 # Set the find root to the iOS developer roots and to user defined paths.
-set(CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_OSX_SYSROOT}
+set(CMAKE_FIND_ROOT_PATH ${CMAKE_DEVELOPER_ROOT} ${CMAKE_OSX_SYSROOT}
   ${CMAKE_PREFIX_PATH} CACHE STRING "iOS find search path root" FORCE)
 # Default to searching for frameworks first.
 set(CMAKE_FIND_FRAMEWORK FIRST)
