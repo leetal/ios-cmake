@@ -64,11 +64,12 @@
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
 #
-# CMAKE_OSX_SYSROOT: Path to the iOS SDK to use.  By default this is
-#    automatically determined from IOS_PLATFORM and xcodebuild, but
+# CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
+#    automatically determined from PLATFORM and xcodebuild, but
+#    automatically determined from PLATFORM and xcodebuild, but
 #    can also be manually specified (although this should not be required).
 #
-# CMAKE_DEVELOPER_ROOT: Path to the Developer directory for the iOS platform
+# CMAKE_DEVELOPER_ROOT: Path to the Developer directory for the platform
 #    being compiled for.  By default this is automatically determined from
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
@@ -94,9 +95,8 @@
 # This toolchain defines the following variables for use externally:
 #
 # XCODE_VERSION: Version number (not including Build version) of Xcode detected.
-# SDK_VERSION: Version of iOS SDK being used.
-# CMAKE_OSX_ARCHITECTURES: Architectures being compiled for (generated from
-#    IOS_PLATFORM).
+# SDK_VERSION: Version of SDK being used.
+# CMAKE_OSX_ARCHITECTURES: Architectures being compiled for (generated from PLATFORM).
 #
 # This toolchain defines the following macros for use externally:
 #
@@ -107,7 +107,7 @@
 #
 # find_host_package (PROGRAM ARGS)
 #   A macro used to find executable programs on the host system, not within the
-#   iOS environment.  Thanks to the android-cmake project for providing the
+#   environment.  Thanks to the android-cmake project for providing the
 #   command.
 #
 # ******************************** DEPRECATIONS *******************************
@@ -290,8 +290,7 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
 else()
   message(FATAL_ERROR "Invalid PLATFORM: ${PLATFORM_INT}")
 endif()
-message(STATUS "Configuring iOS build for platform: ${PLATFORM_INT}, "
-  "architecture(s): ${ARCHS}")
+message(STATUS "Configuring ${SDK_NAME} build for platform: ${PLATFORM_INT}, architecture(s): ${ARCHS}")
 
 if(MODERN_CMAKE AND PLATFORM_INT MATCHES ".*COMBINED" AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode")
   message(FATAL_ERROR "The COMBINED options only work with Xcode generator, -G Xcode")
@@ -470,7 +469,7 @@ else()
   message(STATUS "Using a data_ptr size of 4")
 endif()
 
-message(STATUS "Building for minimum iOS version: ${DEPLOYMENT_TARGET}"
+message(STATUS "Building for minimum ${SDK_NAME} version: ${DEPLOYMENT_TARGET}"
                " (SDK version: ${SDK_VERSION})")
 # Note that only Xcode 7+ supports the newer more specific:
 # -m${SDK_NAME}-version-min flags, older versions of Xcode use:
@@ -538,7 +537,7 @@ endif()
 
 #Check if Xcode generator is used, since that will handle these flags automagically
 if(USED_CMAKE_GENERATOR MATCHES "Xcode")
-  message(STATUS "Not setting any manual commain-line buildflags, since Xcode is selected as generator.")
+  message(STATUS "Not setting any manual command-line buildflags, since Xcode is selected as generator.")
 else()
   set(CMAKE_C_FLAGS
   "${SDK_NAME_VERSION_FLAGS} ${BITCODE} -fobjc-abi-version=2 ${FOBJC_ARC} ${CMAKE_C_FLAGS}")
@@ -589,7 +588,7 @@ endif (NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
 
 # Set the find root to the iOS developer roots and to user defined paths.
 set(CMAKE_FIND_ROOT_PATH ${CMAKE_DEVELOPER_ROOT} ${CMAKE_OSX_SYSROOT}
-  ${CMAKE_PREFIX_PATH} CACHE STRING "iOS find search path root" FORCE)
+  ${CMAKE_PREFIX_PATH} CACHE STRING "SKD find search path root" FORCE)
 # Default to searching for frameworks first.
 set(CMAKE_FIND_FRAMEWORK FIRST)
 # Set up the default search directories for frameworks.
