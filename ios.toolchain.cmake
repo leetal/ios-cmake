@@ -94,7 +94,7 @@
 # This toolchain defines the following variables for use externally:
 #
 # XCODE_VERSION: Version number (not including Build version) of Xcode detected.
-# IOS_SDK_VERSION: Version of iOS SDK being used.
+# SDK_VERSION: Version of iOS SDK being used.
 # CMAKE_OSX_ARCHITECTURES: Architectures being compiled for (generated from
 #    IOS_PLATFORM).
 #
@@ -334,7 +334,7 @@ endif()
 set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL "Whether or not to hide symbols (-fvisibility=hidden)" FORCE)
 # Get the SDK version information.
 execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
-  OUTPUT_VARIABLE IOS_SDK_VERSION
+  OUTPUT_VARIABLE SDK_VERSION
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 # Find the Developer root for the specific iOS platform being compiled for
@@ -404,7 +404,7 @@ else()
   set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" FORCE)
 endif()
 # Standard settings.
-set(CMAKE_SYSTEM_VERSION ${IOS_SDK_VERSION} CACHE INTERNAL "")
+set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
 set(UNIX TRUE CACHE BOOL "")
 set(APPLE TRUE CACHE BOOL "")
 set(IOS TRUE CACHE BOOL "")
@@ -441,7 +441,7 @@ else()
 endif()
 
 message(STATUS "Building for minimum iOS version: ${IOS_DEPLOYMENT_TARGET}"
-               " (SDK version: ${IOS_SDK_VERSION})")
+               " (SDK version: ${SDK_VERSION})")
 # Note that only Xcode 7+ supports the newer more specific:
 # -m${SDK_NAME}-version-min flags, older versions of Xcode use:
 # -m(ios/ios-simulator)-version-min instead.
