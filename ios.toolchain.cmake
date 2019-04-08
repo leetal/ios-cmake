@@ -197,16 +197,21 @@ endif()
 
 set(PLATFORM_INT "${PLATFORM}" CACHE STRING "Type of platform for which the build targets.")
 
+# Handle the case where we are targeting iOS and a version above 10.0 (32-bit support dropped officially)
+if(PLATFORM_INT STREQUAL "OS" AND DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 10.0)
+  set(PLATFORM_INT "OS64")
+  message(STATUS "Targeting minimum SDK version ${DEPLOYMENT_TARGET}. Dropping 32-bit support.")
+elseif(PLATFORM_INT STREQUAL "SIMULATOR" AND DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 10.0)
+  set(PLATFORM_INT "SIMULATOR64")
+  message(STATUS "Targeting minimum SDK version ${DEPLOYMENT_TARGET}. Dropping 32-bit support.")
+endif()
+
 # Determine the platform name and architectures for use in xcodebuild commands
 # from the specified PLATFORM name.
 if(PLATFORM_INT STREQUAL "OS")
   set(SDK_NAME iphoneos)
   if(NOT ARCHS)
-    if (XCODE_VERSION VERSION_GREATER 10.0)
-      set(ARCHS armv7 armv7s arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
-    else()
-      set(ARCHS armv7 armv7s arm64)
-    endif()
+    set(ARCHS armv7 armv7s arm64)
   endif()
 elseif(PLATFORM_INT STREQUAL "OS64")
   set(SDK_NAME iphoneos)
