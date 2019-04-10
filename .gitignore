@@ -1,5 +1,4 @@
 # Project specific
-build/
 .DS_Store
 
 # Xcode
@@ -25,6 +24,7 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+.idea/
 
 ## Obj-C/Swift specific
 *.hmap
