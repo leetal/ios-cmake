@@ -408,9 +408,15 @@ set(CMAKE_SYSTEM_FRAMEWORK_PATH
   ${CMAKE_OSX_SYSROOT}/System/Library/PrivateFrameworks
   ${CMAKE_OSX_SYSROOT}/Developer/Library/Frameworks)
 # Only search the specified iOS SDK, not the remainder of the host filesystem.
-set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+if( NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM )
+  set( CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY )
+endif()
+if( NOT CMAKE_FIND_ROOT_PATH_MODE_LIBRARY )
+  set( CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY )
+endif()
+if( NOT CMAKE_FIND_ROOT_PATH_MODE_INCLUDE )
+  set( CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY )
+endif()
 # This little macro lets you set any XCode specific property.
 macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE XCODE_RELVERSION)
   set(XCODE_RELVERSION_I "${XCODE_RELVERSION}")
