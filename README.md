@@ -60,7 +60,7 @@ usage of the library much more simple!
 
 `-DENABLE_VISIBILITY=(BOOL)` - Disabled by default, specify TRUE or 1 to enable symbol visibility support
 
-`-DIOS_ARCH=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DPLATFORM` (see above)
+`-DARCHS=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DPLATFORM` (see above)
 
 __*To combine all platforms into the same FAT-library, either build any of the "*COMBINED*" platform types OR use the 
 LIPO tool. More information on how to combine libraries with LIPO is readily available on the net.*__
