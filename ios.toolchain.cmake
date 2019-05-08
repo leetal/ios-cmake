@@ -152,7 +152,7 @@ endif()
 
 if(DEFINED IOS_DEPLOYMENT_TARGET)
   set(DEPLOYMENT_TARGET ${IOS_DEPLOYMENT_TARGET})
-  message(DEPRECATION "CMAKE_IOS_DEVELOPER_ROOT argument is DEPRECATED. Consider using the new CMAKE_DEVELOPER_ROOT argument instead.")
+  message(DEPRECATION "IOS_DEPLOYMENT_TARGET argument is DEPRECATED. Consider using the new DEPLOYMENT_TARGET argument instead.")
 endif()
 
 if(DEFINED CMAKE_IOS_DEVELOPER_ROOT)
