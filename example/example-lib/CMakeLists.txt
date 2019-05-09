@@ -1,5 +1,25 @@
 cmake_minimum_required (VERSION 3.2)
 project (example-ios C CXX)
+enable_testing()
+
+# Add some sanitary checks that the toolchain is actually working!
+include(CheckCXXSymbolExists)
+check_cxx_symbol_exists(kqueue sys/event.h HAVE_KQUEUE)
+if(NOT HAVE_KQUEUE)
+  message(FATAL_ERROR "kqueue NOT found!")
+else()
+  message(STATUS "kqueue found!")
+endif()
+
+find_library(HAVE_ARKIT ARKit)
+if (NOT HAVE_ARKIT)
+  message(FATAL_ERROR "ARKit.framework NOT found!")
+else()
+  message(STATUS "ARKit.framework found!")
+endif()
+
+# Try to find XCtest as well
+find_host_package(XCTest REQUIRED)
 
 # Includes
 include_directories(${example-ios_SOURCE_DIR})
