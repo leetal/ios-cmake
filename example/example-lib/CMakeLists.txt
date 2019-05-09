@@ -11,11 +11,11 @@ else()
   message(STATUS "kqueue found!")
 endif()
 
-find_library(HAVE_ARKIT ARKit)
-if (NOT HAVE_ARKIT)
-  message(FATAL_ERROR "ARKit.framework NOT found!")
+find_library(HAVE_UIKIT UIKit)
+if (NOT HAVE_UIKIT)
+  message(FATAL_ERROR "UIKit.framework NOT found!")
 else()
-  message(STATUS "ARKit.framework found!")
+  message(STATUS "UIKit.framework found!")
 endif()
 
 # Try to find XCtest as well
