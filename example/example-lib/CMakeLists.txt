@@ -18,8 +18,13 @@ else()
   message(STATUS "UIKit.framework found!")
 endif()
 
-# Try to find XCtest as well
-find_host_package(XCTest REQUIRED)
+# Hook up XCTest for the supported plaforms (all but WatchOS)
+if(NOT PLATFORM MATCHES ".*WATCHOS.*")
+  # Use the standard find_package, broken between 3.14.0 and 3.14.4 at least for XCtest...
+  find_package(XCTest)
+  # Fallback: Try to find XCtest as host package via toochain macro (should always work)
+  find_host_package(XCTest REQUIRED)
+endif()
 
 # Includes
 include_directories(${example-ios_SOURCE_DIR})
