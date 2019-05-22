@@ -615,7 +615,7 @@ set(CMAKE_FRAMEWORK_PATH
   ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
   ${CMAKE_FRAMEWORK_PATH} CACHE STRING "Frameworks search paths")
 
-# Only search the specified iOS SDK, not the remainder of the host filesystem.
+# By default, search both the specified iOS SDK and the remainder of the host filesystem.
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE STRING "" ${FORCE_CACHE})
 endif()
