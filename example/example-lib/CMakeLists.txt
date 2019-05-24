@@ -29,6 +29,10 @@ endif()
 # Includes
 include_directories(${example-ios_SOURCE_DIR})
 
+# Make sure try_compile() works
+include(CheckTypeSize)
+check_type_size(time_t SIZEOF_TIME_T)
+
 # Source files
 set(SOURCES
   HelloWorld.cpp
