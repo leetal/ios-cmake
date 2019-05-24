@@ -32,7 +32,7 @@ else
   pushd example/example-lib/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DPLATFORM=${PLATFORM} ${SHARED_EXT}\
+    -DPLATFORM=${PLATFORM} -DENABLE_STRICT_TRY_COMPILE=1 ${SHARED_EXT}\
    || exit 1
   cmake --build . --config Release --target install || exit 1
   popd

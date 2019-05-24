@@ -82,6 +82,9 @@
 #
 # ENABLE_VISIBILITY: (1|0) Enables or disables symbol visibility support. Default 0 (false, visibility hidden by default)
 #
+# ENABLE_STRICT_TRY_COMPILE: (1|0) Enables or disables strict try_compile() on all Check* directives (will run linker
+#    to actually check if linking is possible). Default 0 (false, will set CMAKE_TRY_COMPILE_TARGET_TYPE to STATIC_LIBRARY)
+#
 # ARCHS: (armv7 armv7s armv7k arm64 arm64_32 i386 x86_64) If specified, will override the default architectures for the given PLATFORM
 #    OS = armv7 armv7s arm64 (if applicable)
 #    OS64 = arm64 (if applicable)
@@ -372,6 +375,14 @@ if(NOT DEFINED ENABLE_VISIBILITY)
   message(STATUS "Hiding symbols visibility by default. ENABLE_VISIBILITY not provided!")
 endif()
 set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL "Whether or not to hide symbols (-fvisibility=hidden)" ${FORCE_CACHE})
+# Set strict compiler checks or not
+if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
+  # Unless specified, disable symbols visibility by default
+  set(ENABLE_STRICT_TRY_COMPILE FALSE)
+  message(STATUS "Using NON-strict compiler checks by default. ENABLE_STRICT_TRY_COMPILE not provided!")
+endif()
+set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL "Whether or not to use strict compiler
+checks" ${FORCE_CACHE})
 # Get the SDK version information.
 execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
   OUTPUT_VARIABLE SDK_VERSION
@@ -454,8 +465,10 @@ set(CMAKE_RANLIB ranlib CACHE FILEPATH "" FORCE)
 set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 # Set the architectures for which to build.
 set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture for iOS")
-# Change the type of target generated for try_compile() so it'll work when cross-compiling using Xcode
-if(USED_CMAKE_GENERATOR MATCHES "Xcode")
+# Change the type of target generated for try_compile() so it'll work when cross-compiling, weak compiler checks
+if(ENABLE_STRICT_TRY_COMPILE_INT)
+  message(STATUS "Using strict compiler checks (default in CMake).")
+else()
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 endif()
 # All iOS/Darwin specific settings - some may be redundant.
