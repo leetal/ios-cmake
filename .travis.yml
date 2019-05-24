@@ -7,58 +7,50 @@ matrix:
       osx_image: xcode10.2
       compiler: clang
       env: 
-        - IOS_PLATFORM=SIMULATOR
-        - BUILD_SHARED=0
-        - USE_XCODE=0
+        - PLATFORM=SIMULATOR
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env: 
-        - IOS_PLATFORM=SIMULATOR64
-        - BUILD_SHARED=0
-        - USE_XCODE=0
+        - PLATFORM=SIMULATOR64
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env: 
-        - IOS_PLATFORM=OS
-        - BUILD_SHARED=0
-        - USE_XCODE=0
+        - PLATFORM=OS
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env: 
-        - IOS_PLATFORM=OS64
-        - BUILD_SHARED=0
-        - USE_XCODE=0
+        - PLATFORM=OS64
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env: 
-        - IOS_PLATFORM=OS
+        - PLATFORM=OS
         - BUILD_SHARED=1
-        - USE_XCODE=0
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env:
-        - IOS_PLATFORM=TVOS
-        - BUILD_SHARED=0
-        - USE_XCODE=0
+        - PLATFORM=TVOS
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env:
-        - IOS_PLATFORM=WATCHOS
-        - BUILD_SHARED=0
-        - USE_XCODE=0
+        - PLATFORM=WATCHOS
     - os: osx
       osx_image: xcode10.2
       compiler: clang
       env:
-        - IOS_PLATFORM=OS64COMBINED
-        - BUILD_SHARED=0
+        - PLATFORM=OS64COMBINED
         - USE_XCODE=1
+    - os: osx
+      osx_image: xcode10.2
+      compiler: clang
+      env:
+        - PLATFORM=OS
+        - BUILD_LIBRESSL=1
 
 install: true
 

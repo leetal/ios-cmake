@@ -349,7 +349,7 @@ if(NOT DEFINED DEPLOYMENT_TARGET)
   message(STATUS "Using the default min-version since DEPLOYMENT_TARGET not provided!")
 endif()
 # Use bitcode or not
-if(NOT DEFINED ENABLE_BITCODE AND NOT ARCHS MATCHES "((^|, )(i386|x86_64))+")
+if(NOT DEFINED ENABLE_BITCODE AND NOT ARCHS MATCHES "((^|;|, )(i386|x86_64))+")
   # Unless specified, enable bitcode support by default
   message(STATUS "Enabling bitcode support by default. ENABLE_BITCODE not provided!")
   set(ENABLE_BITCODE TRUE)
@@ -454,8 +454,10 @@ set(CMAKE_RANLIB ranlib CACHE FILEPATH "" FORCE)
 set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 # Set the architectures for which to build.
 set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture for iOS")
-# Change the type of target generated for try_compile() so it'll work when cross-compiling
-set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+# Change the type of target generated for try_compile() so it'll work when cross-compiling using Xcode
+if(USED_CMAKE_GENERATOR MATCHES "Xcode")
+  set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+endif()
 # All iOS/Darwin specific settings - some may be redundant.
 set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
@@ -472,11 +474,11 @@ set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
 set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
 
-if(ARCHS MATCHES "((^|, )(arm64|arm64e|x86_64))+")
+if(ARCHS MATCHES "((^|;|, )(arm64|arm64e|x86_64))+")
   set(CMAKE_C_SIZEOF_DATA_PTR 8)
   set(CMAKE_CXX_SIZEOF_DATA_PTR 8)
-  if(ARCHS MATCHES "((^|, )(arm64|arm64e))+")
-    set(CMAKE_SYSTEM_PROCESSOR "arm64")
+  if(ARCHS MATCHES "((^|;|, )(arm64|arm64e))+")
+    set(CMAKE_SYSTEM_PROCESSOR "aarch64")
   else()
     set(CMAKE_SYSTEM_PROCESSOR "x86_64")
   endif()
@@ -634,7 +636,7 @@ endif()
 # Some helper-macros below to simplify and beautify the CMakeFile
 #
 
-# This little macro lets you set any XCode specific property.
+# This little macro lets you set any Xcode specific property.
 macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE XCODE_RELVERSION)
   set(XCODE_RELVERSION_I "${XCODE_RELVERSION}")
   if(XCODE_RELVERSION_I STREQUAL "All")
