@@ -8,6 +8,7 @@ PLATFORM=${PLATFORM:-OS}             # Default to "OS" platform
 BUILD_SHARED=${BUILD_SHARED:-0}
 USE_XCODE=${USE_XCODE:-0}
 BUILD_LIBRESSL=${BUILD_LIBRESSL:-0}
+USE_STRICT_COMPILER_CHECKS=${USE_STRICT_COMPILER_CHECKS:-0}
 
 SHARED_EXT=""
 if [[ ${BUILD_SHARED} -eq 1 ]]; then
@@ -19,12 +20,17 @@ if [[ ${USE_XCODE} -eq 1 ]]; then
     GENERATOR_EXT="-G Xcode"
 fi
 
+USE_STRICT_COMPILER_CHECKS_EXT=""
+if [[ ${USE_STRICT_COMPILER_CHECKS} -eq 1 ]]; then
+    USE_STRICT_COMPILER_CHECKS_EXT="-DENABLE_STRICT_TRY_COMPILE=1"
+fi
+
 if [[ ${BUILD_LIBRESSL} -eq 1 ]]; then
   mkdir -p example/example-libressl/build
   pushd example/example-libressl/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DPLATFORM=${PLATFORM} || exit 1
+    -DPLATFORM=${PLATFORM} ${USE_STRICT_COMPILER_CHECKS_EXT} || exit 1
   cmake --build . --config Release --parallel 4 || exit 1
   popd
 else
@@ -32,7 +38,7 @@ else
   pushd example/example-lib/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DPLATFORM=${PLATFORM} -DENABLE_STRICT_TRY_COMPILE=1 ${SHARED_EXT}\
+    -DPLATFORM=${PLATFORM} ${USE_STRICT_COMPILER_CHECKS_EXT} ${SHARED_EXT}\
    || exit 1
   cmake --build . --config Release --target install || exit 1
   popd

@@ -1,57 +1,62 @@
 language: objective-c
 
 matrix:
-  fast_finish: true
   include:
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env: 
-        - PLATFORM=SIMULATOR
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env: 
-        - PLATFORM=SIMULATOR64
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env: 
-        - PLATFORM=OS
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env: 
-        - PLATFORM=OS64
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env: 
-        - PLATFORM=OS
-        - BUILD_SHARED=1
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env:
-        - PLATFORM=TVOS
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env:
-        - PLATFORM=WATCHOS
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env:
-        - PLATFORM=OS64COMBINED
-        - USE_XCODE=1
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=SIMULATOR
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=SIMULATOR64
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=OS
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=OS64
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=OS
+      - BUILD_SHARED=1
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=TVOS
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=WATCHOS
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=OS64COMBINED
+      - USE_XCODE=1
   allow_failures:
-    - os: osx
-      osx_image: xcode10.2
-      compiler: clang
-      env:
-        - PLATFORM=OS
-        - BUILD_LIBRESSL=1
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=OS
+      - USE_STRICT_COMPILER_CHECKS=1
+  - os: osx
+    osx_image: xcode10.2
+    compiler: clang
+    env:
+      - PLATFORM=OS
+      - BUILD_LIBRESSL=1
 
 install: true
 
