@@ -1,5 +1,9 @@
 language: objective-c
 
+env:
+  matrix:
+    - PLATFORM=OS
+
 matrix:
   include:
   - os: osx
