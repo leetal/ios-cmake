@@ -66,7 +66,6 @@
 #
 # CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
 #    automatically determined from PLATFORM and xcodebuild, but
-#    automatically determined from PLATFORM and xcodebuild, but
 #    can also be manually specified (although this should not be required).
 #
 # CMAKE_DEVELOPER_ROOT: Path to the Developer directory for the platform
@@ -631,7 +630,7 @@ set(CMAKE_FRAMEWORK_PATH
   ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
   ${CMAKE_FRAMEWORK_PATH} CACHE STRING "Frameworks search paths")
 
-# Only search the specified iOS SDK, not the remainder of the host filesystem.
+# By default, search both the specified iOS SDK and the remainder of the host filesystem.
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE STRING "" ${FORCE_CACHE})
 endif()
