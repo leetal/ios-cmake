@@ -7,7 +7,7 @@ is-variable-set() {
 PLATFORM=${PLATFORM:-OS}             # Default to "OS" platform
 BUILD_SHARED=${BUILD_SHARED:-0}
 USE_XCODE=${USE_XCODE:-0}
-BUILD_LIBRESSL=${BUILD_LIBRESSL:-0}
+BUILD_CURL=${BUILD_CURL:-0}
 USE_STRICT_COMPILER_CHECKS=${USE_STRICT_COMPILER_CHECKS:-0}
 
 SHARED_EXT=""
@@ -25,9 +25,9 @@ if [[ ${USE_STRICT_COMPILER_CHECKS} -eq 1 ]]; then
     USE_STRICT_COMPILER_CHECKS_EXT="-DENABLE_STRICT_TRY_COMPILE=1"
 fi
 
-if [[ ${BUILD_LIBRESSL} -eq 1 ]]; then
-  mkdir -p example/example-libressl/build
-  pushd example/example-libressl/build
+if [[ ${BUILD_CURL} -eq 1 ]]; then
+  mkdir -p example/example-curl/build
+  pushd example/example-curl/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
     -DPLATFORM=${PLATFORM} ${USE_STRICT_COMPILER_CHECKS_EXT} || exit 1

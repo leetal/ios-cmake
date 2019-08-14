@@ -376,12 +376,11 @@ endif()
 set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL "Whether or not to hide symbols (-fvisibility=hidden)" ${FORCE_CACHE})
 # Set strict compiler checks or not
 if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
-  # Unless specified, disable symbols visibility by default
+  # Unless specified, disable strict try_compile()
   set(ENABLE_STRICT_TRY_COMPILE FALSE)
   message(STATUS "Using NON-strict compiler checks by default. ENABLE_STRICT_TRY_COMPILE not provided!")
 endif()
-set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL "Whether or not to use strict compiler
-checks" ${FORCE_CACHE})
+set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL "Whether or not to use strict compiler checks" ${FORCE_CACHE})
 # Get the SDK version information.
 execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
   OUTPUT_VARIABLE SDK_VERSION
@@ -429,6 +428,15 @@ set(CMAKE_C_CREATE_STATIC_LIBRARY
   "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
 set(CMAKE_CXX_CREATE_STATIC_LIBRARY
   "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
+# Find the toolchain's provided install_name_tool if none is found on the host
+if(NOT CMAKE_INSTALL_NAME_TOOL)
+  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT} -find install_name_tool
+      OUTPUT_VARIABLE CMAKE_INSTALL_NAME_TOOL_INT
+      ERROR_QUIET
+      OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(CMAKE_INSTALL_NAME_TOOL ${CMAKE_INSTALL_NAME_TOOL_INT} CACHE STRING "" ${FORCE_CACHE})
+  message(STATUS "Using install_name_tool: ${CMAKE_INSTALL_NAME_TOOL}")
+endif()
 # Get the version of Darwin (OS X) of the host.
 execute_process(COMMAND uname -r
   OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION
@@ -446,8 +454,8 @@ if(MODERN_CMAKE)
 
   # Provide flags for a combined FAT library build on newer CMake versions
   if(PLATFORM_INT MATCHES ".*COMBINED")
-    set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH NO CACHE INTERNAL "")
-    set(CMAKE_IOS_INSTALL_COMBINED YES CACHE INTERNAL "")
+    set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH NO CACHE INTERNAL "" ${FORCE_CACHE})
+    set(CMAKE_IOS_INSTALL_COMBINED YES CACHE INTERNAL "" ${FORCE_CACHE})
     message(STATUS "Will combine built (static) artifacts into FAT lib...")
   endif()
 else()
@@ -608,40 +616,29 @@ set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".tbd" ".dylib" ".so" ".a")
 set(CMAKE_SHARED_LIBRARY_SONAME_C_FLAG "-install_name")
 
-# Hack: if a new cmake (which uses CMAKE_INSTALL_NAME_TOOL) runs on an old
-# build tree (where install_name_tool was hardcoded) and where
-# CMAKE_INSTALL_NAME_TOOL isn't in the cache and still cmake didn't fail in
-# CMakeFindBinUtils.cmake (because it isn't rerun) hardcode
-# CMAKE_INSTALL_NAME_TOOL here to install_name_tool, so it behaves as it did
-# before, Alex.
-if(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
-  find_program(CMAKE_INSTALL_NAME_TOOL install_name_tool)
-endif(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
-
 # Set the find root to the iOS developer roots and to user defined paths.
-set(CMAKE_FIND_ROOT_PATH ${CMAKE_DEVELOPER_ROOT} ${CMAKE_OSX_SYSROOT_INT}
-  ${CMAKE_PREFIX_PATH} CACHE STRING "Root path that will be prepended to all search paths")
+set(CMAKE_FIND_ROOT_PATH ${CMAKE_OSX_SYSROOT_INT} ${CMAKE_PREFIX_PATH} CACHE STRING "Root path that will be prepended
+ to all search paths")
 # Default to searching for frameworks first.
 set(CMAKE_FIND_FRAMEWORK FIRST)
 # Set up the default search directories for frameworks.
 set(CMAKE_FRAMEWORK_PATH
-  ${CMAKE_DEVELOPER_ROOT}/Library/Frameworks
   ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
   ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
-  ${CMAKE_FRAMEWORK_PATH} CACHE STRING "Frameworks search paths")
+  ${CMAKE_FRAMEWORK_PATH} CACHE STRING "Frameworks search paths" ${FORCE_CACHE})
 
 # By default, search both the specified iOS SDK and the remainder of the host filesystem.
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE STRING "" ${FORCE_CACHE})
 endif()
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_LIBRARY)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY CACHE STRING "" ${FORCE_CACHE})
 endif()
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_INCLUDE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY CACHE STRING "" ${FORCE_CACHE})
 endif()
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_PACKAGE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY CACHE STRING "" ${FORCE_CACHE})
 endif()
 
 #

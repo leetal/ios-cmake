@@ -37,14 +37,7 @@ matrix:
   - os: osx
     osx_image: xcode10.2
     env:
-      - PLATFORM=OS USE_STRICT_COMPILER_CHECKS=1
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=OS BUILD_LIBRESSL=1
-  allow_failures:
-    - env: PLATFORM=OS BUILD_LIBRESSL=1
-    - env: PLATFORM=OS USE_STRICT_COMPILER_CHECKS=1
+      - PLATFORM=OS64COMBINED BUILD_CURL=1 USE_XCODE=1
 
 install: true
 
