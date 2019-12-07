@@ -473,7 +473,7 @@ set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 # Set the architectures for which to build.
 set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture for iOS")
 # Change the type of target generated for try_compile() so it'll work when cross-compiling, weak compiler checks
-if(ENABLE_STRICT_TRY_COCMake 3.14+ support building for iOS, watchOS and tvOS out of the box.MPILE_INT)
+if(ENABLE_STRICT_TRY_COMPILE_INT)
   message(STATUS "Using strict compiler checks (default in CMake).")
 else()
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
