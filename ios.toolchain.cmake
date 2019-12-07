@@ -442,16 +442,16 @@ execute_process(COMMAND uname -r
   OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(SDK_NAME MATCHES "iphone")
+  set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
+endif()
 # CMake 3.14+ support building for iOS, watchOS and tvOS out of the box.
 if(MODERN_CMAKE)
-  if(SDK_NAME MATCHES "iphone")
-    set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
-  elseif(SDK_NAME MATCHES "appletv")
+  if(SDK_NAME MATCHES "appletv")
     set(CMAKE_SYSTEM_NAME tvOS CACHE INTERNAL "" ${FORCE_CACHE})
   elseif(SDK_NAME MATCHES "watch")
     set(CMAKE_SYSTEM_NAME watchOS CACHE INTERNAL "" ${FORCE_CACHE})
   endif()
-
   # Provide flags for a combined FAT library build on newer CMake versions
   if(PLATFORM_INT MATCHES ".*COMBINED")
     set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH NO CACHE INTERNAL "" ${FORCE_CACHE})
@@ -460,7 +460,7 @@ if(MODERN_CMAKE)
   endif()
 else()
   # Legacy code path prior to CMake 3.14
-  set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
+  set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
 endif()
 # Standard settings.
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
@@ -473,7 +473,7 @@ set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 # Set the architectures for which to build.
 set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture for iOS")
 # Change the type of target generated for try_compile() so it'll work when cross-compiling, weak compiler checks
-if(ENABLE_STRICT_TRY_COMPILE_INT)
+if(ENABLE_STRICT_TRY_COCMake 3.14+ support building for iOS, watchOS and tvOS out of the box.MPILE_INT)
   message(STATUS "Using strict compiler checks (default in CMake).")
 else()
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
