@@ -459,7 +459,7 @@ if(MODERN_CMAKE)
     message(STATUS "Will combine built (static) artifacts into FAT lib...")
   endif()
 else()
-  # Legacy code path prior to CMake 3.14
+  # Legacy code path prior to CMake 3.14 or fallback if no SDK_NAME specified
   set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
 endif()
 # Standard settings.
@@ -589,6 +589,7 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -ffast-math ${CMAKE_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_LINK_FLAGS "${SDK_NAME_VERSION_FLAGS} -Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
   set(CMAKE_CXX_LINK_FLAGS "${SDK_NAME_VERSION_FLAGS}  -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
+  SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 
   # In order to ensure that the updated compiler flags are used in try_compile()
   # tests, we have to forcibly set them in the CMake cache, not merely set them
