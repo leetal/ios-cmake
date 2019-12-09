@@ -480,6 +480,7 @@ else()
 endif()
 # All iOS/Darwin specific settings - some may be redundant.
 set(CMAKE_MACOSX_BUNDLE YES)
+set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
 set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
 set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
 set(CMAKE_SHARED_MODULE_PREFIX "lib")
