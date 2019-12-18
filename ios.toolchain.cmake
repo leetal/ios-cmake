@@ -442,16 +442,16 @@ execute_process(COMMAND uname -r
   OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(SDK_NAME MATCHES "iphone")
+  set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
+endif()
 # CMake 3.14+ support building for iOS, watchOS and tvOS out of the box.
 if(MODERN_CMAKE)
-  if(SDK_NAME MATCHES "iphone")
-    set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
-  elseif(SDK_NAME MATCHES "appletv")
+  if(SDK_NAME MATCHES "appletv")
     set(CMAKE_SYSTEM_NAME tvOS CACHE INTERNAL "" ${FORCE_CACHE})
   elseif(SDK_NAME MATCHES "watch")
     set(CMAKE_SYSTEM_NAME watchOS CACHE INTERNAL "" ${FORCE_CACHE})
   endif()
-
   # Provide flags for a combined FAT library build on newer CMake versions
   if(PLATFORM_INT MATCHES ".*COMBINED")
     set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH NO CACHE INTERNAL "" ${FORCE_CACHE})
@@ -459,8 +459,8 @@ if(MODERN_CMAKE)
     message(STATUS "Will combine built (static) artifacts into FAT lib...")
   endif()
 else()
-  # Legacy code path prior to CMake 3.14
-  set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
+  # Legacy code path prior to CMake 3.14 or fallback if no SDK_NAME specified
+  set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
 endif()
 # Standard settings.
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
@@ -591,6 +591,7 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -ffast-math ${CMAKE_CXX_FLAGS_RELEASE}")
   set(CMAKE_C_LINK_FLAGS "${SDK_NAME_VERSION_FLAGS} -Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
   set(CMAKE_CXX_LINK_FLAGS "${SDK_NAME_VERSION_FLAGS}  -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
+  SET(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
 
   # In order to ensure that the updated compiler flags are used in try_compile()
   # tests, we have to forcibly set them in the CMake cache, not merely set them
