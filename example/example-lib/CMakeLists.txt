@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 3.2)
 project (example-ios C CXX)
 enable_testing()
 
+MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
+
 # Add some sanitary checks that the toolchain is actually working!
 include(CheckCXXSymbolExists)
 check_cxx_symbol_exists(kqueue sys/event.h HAVE_KQUEUE)
