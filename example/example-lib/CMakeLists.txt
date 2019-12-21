@@ -54,6 +54,10 @@ else()
   message(STATUS "Building static version...")
 endif()
 
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX ${example-ios_SOURCE_DIR}/../example-app/example-lib CACHE PATH "Install path" FORCE)
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 # Executable
 #add_executable (helloworld main.cpp)
 
@@ -64,6 +68,5 @@ endif()
 set_xcode_property(example GCC_GENERATE_DEBUGGING_SYMBOLS YES "All")
 
 # Installation
-set(CMAKE_INSTALL_PREFIX "${example-ios_SOURCE_DIR}/../example-app/example-lib")
 install (TARGETS example DESTINATION lib)
 install (FILES ${HEADERS} DESTINATION include)
