@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 3.2)
 project (example-ios C CXX)
 enable_testing()
 
+MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
+
 # Add some sanitary checks that the toolchain is actually working!
 include(CheckCXXSymbolExists)
 check_cxx_symbol_exists(kqueue sys/event.h HAVE_KQUEUE)
@@ -54,6 +56,10 @@ else()
   message(STATUS "Building static version...")
 endif()
 
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX ${example-ios_SOURCE_DIR}/../example-app/example-lib CACHE PATH "Install path" FORCE)
+endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
 # Executable
 #add_executable (helloworld main.cpp)
 
@@ -64,6 +70,5 @@ endif()
 set_xcode_property(example GCC_GENERATE_DEBUGGING_SYMBOLS YES "All")
 
 # Installation
-set(CMAKE_INSTALL_PREFIX "${example-ios_SOURCE_DIR}/../example-app/example-lib")
 install (TARGETS example DESTINATION lib)
 install (FILES ${HEADERS} DESTINATION include)
