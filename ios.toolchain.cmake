@@ -452,9 +452,12 @@ if(MODERN_CMAKE)
     set(CMAKE_IOS_INSTALL_COMBINED YES CACHE INTERNAL "" ${FORCE_CACHE})
     message(STATUS "Will combine built (static) artifacts into FAT lib...")
   endif()
-else()
+elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.10")
   # Legacy code path prior to CMake 3.14 or fallback if no SDK_NAME specified
   set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
+else()
+  # Legacy code path prior to CMake 3.14 or fallback if no SDK_NAME specified
+  set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
 endif()
 # Standard settings.
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
