@@ -1,11 +1,7 @@
 A CMake toolchain file for iOS, watchOS and tvOS development with full simulator support and toggable options!
 
 ### NEW!
-* The toolchain now supports the new features introduced in CMake 3.14 that allows combined (FAT libraries) to be built.
-    * Please see below for the "COMBINED" options that will build a static, combined FAT library by default.
-* The `IOS_PLATFORM` argument have been renamed to `PLATFORM` to better align with how the toolchain will be used.
-    * `IOS_PLATFORM` argument still exists, but is deprecated.
-* MUCH better support for Xcode generated project on CMake 3.14+
+* Now exposes Autoconf compatible triples, accessible via the `APPLE_TARGET_TRIPLE` variable.
 
 ios-cmake
 =========
@@ -13,11 +9,11 @@ ios-cmake
 [![Build Status](https://travis-ci.org/leetal/ios-cmake.svg?branch=master)](https://travis-ci.org/leetal/ios-cmake)
 
 Tested with the following combinations:
-* XCode 5.x, iOS SDK 7
-* XCode 6.1.x, iOS SDK 8.1
-* XCode 8.2.x, iOS SDK 10.2
-* XCode 9.4.x, iOS SDK 11.4
-* XCode 10.2.x, iOS SDK 12.2
+* XCode 8.3, iOS SDK 10.3
+* XCode 9.4, iOS SDK 11.4
+* XCode 10.2, iOS SDK 12.2
+* XCode 11.1, iOS SDK 13.1
+* XCode 11.3, iOS SDK 13.3
 
 # Example usage 
 **NOTE: The below commands will build for 64-bit simulator only. Change the `-DPLATFORM` to the applicable value if targeting another platform.**
@@ -46,12 +42,21 @@ This will build and install the library for the given IOS_PLATFORM.
 * Set `-DPLATFORM` to "WATCHOSCOMBINED" to build for watchOS & Simulator (armv7k, arm64_32, i386)
 * Set `-DPLATFORM` to "SIMULATOR_WATCHOS" to build for watchOS Simulator (i386)
 
-### COMBINED options
+### COMBINED Options
 The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) will build complete FAT-libraries for 
 the given platform. These FAT-libraries include slices for both device and simulator, making the distribution and 
 usage of the library much more simple!
 
 **NOTE: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode), together with a install-target (see example above).**
+
+### Exposed Variables
+`XCODE_VERSION` - Version number (not including Build version) of Xcode detected.
+
+`SDK_VERSION` - Version of SDK being used.
+
+`CMAKE_OSX_ARCHITECTURES` - Architectures being compiled for (generated from PLATFORM).
+
+`APPLE_TARGET_TRIPLE` - Used by autoconf build systems. NOTE: If "`ARCHS` are overridden, this will **NOT** be set! 
 
 ### Additional Options
 `-DENABLE_BITCODE=(BOOL)` - Enabled by default, specify FALSE or 0 to disable bitcode
