@@ -51,7 +51,7 @@ The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) wi
 the given platform. These FAT-libraries include slices for both device and simulator, making the distribution and 
 usage of the library much more simple!
 
-**NOTE: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode).** 
+**NOTE: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode), together with a install-target (see example above).**
 
 ### Additional Options
 `-DENABLE_BITCODE=(BOOL)` - Enabled by default, specify FALSE or 0 to disable bitcode
