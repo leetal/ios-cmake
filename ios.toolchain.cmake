@@ -1,5 +1,6 @@
 # This file is part of the ios-cmake project. It was retrieved from
-# https://github.com/cristeab/ios-cmake.git, which is a fork of
+# https://github.com/gerstrong/ios-cmake.git which is a fork of
+# https://github.com/cristeab/ios-cmake.git, which again is a fork of
 # https://code.google.com/p/ios-cmake/. Which in turn is based off of
 # the Platform/Darwin.cmake and Platform/UnixPaths.cmake files which
 # are included with CMake 2.8.4
@@ -144,6 +145,12 @@ execute_process(COMMAND xcodebuild -version
 string(REGEX MATCH "Xcode [0-9\\.]+" XCODE_VERSION "${XCODE_VERSION}")
 string(REGEX REPLACE "Xcode ([0-9\\.]+)" "\\1" XCODE_VERSION "${XCODE_VERSION}")
 
+# Assuming that xcode 12.0 is installed you most probably have ios sdk 14.2 or later installed (tested on Big Sur)
+# if you don't set a deployment target it will be set the way you only get 64-bit builds
+if(NOT DEFINED DEPLOYMENT_TARGET AND XCODE_VERSION VERSION_GREATER 12.0)
+  option(DROP_32_BIT "Will make drop 32-bit support universally. On later sdks you won't be able to build 32-bit apps" yes)
+endif()
+
 ######## ALIASES (DEPRECATION WARNINGS)
 
 if(DEFINED IOS_PLATFORM)
@@ -182,7 +189,9 @@ endif()
 # CMAKE_OSX_ARCHITECTURES is propagated to them by CMake.
 if(NOT DEFINED PLATFORM)
   if (CMAKE_OSX_ARCHITECTURES)
-    if(CMAKE_OSX_ARCHITECTURES MATCHES ".*arm.*" AND CMAKE_OSX_SYSROOT MATCHES ".*iphoneos.*")
+    if(CMAKE_OSX_ARCHITECTURES MATCHES "arm64" AND CMAKE_OSX_SYSROOT MATCHES ".*iphoneos.*")
+      set(PLATFORM "OS64")
+    elseif(CMAKE_OSX_ARCHITECTURES MATCHES ".*arm.*" AND CMAKE_OSX_SYSROOT MATCHES ".*iphoneos.*")
       set(PLATFORM "OS")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "i386" AND CMAKE_OSX_SYSROOT MATCHES ".*iphonesimulator.*")
       set(PLATFORM "SIMULATOR")
@@ -199,7 +208,11 @@ if(NOT DEFINED PLATFORM)
     endif()
   endif()
   if (NOT PLATFORM)
-    set(PLATFORM "OS")
+    if(DROP_32_BIT)
+      set(PLATFORM "OS64")
+    else()
+      set(PLATFORM "OS")
+    endif()
   endif()
 endif()
 
