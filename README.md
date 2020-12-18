@@ -14,6 +14,7 @@ Tested with the following combinations:
 * XCode 10.2, iOS SDK 12.2
 * XCode 11.1, iOS SDK 13.1
 * XCode 11.3, iOS SDK 13.3
+* XCode 12.2, iOS SDK 14.2
 
 # Example usage 
 **NOTE: The below commands will build for 64-bit simulator only. Change the `-DPLATFORM` to the applicable value if targeting another platform.**
