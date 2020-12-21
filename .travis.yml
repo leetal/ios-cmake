@@ -43,6 +43,10 @@ matrix:
     env:
       - PLATFORM=OS64COMBINED USE_XCODE=1
   - os: osx
+    osx_image: xcode12.2
+    env:
+      - PLATFORM=OS64COMBINED USE_XCODE=1
+  - os: osx
     osx_image: xcode11.3
     env:
       - PLATFORM=OS64COMBINED BUILD_CURL=1 USE_XCODE=1
