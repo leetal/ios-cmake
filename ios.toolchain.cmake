@@ -149,6 +149,8 @@ string(REGEX REPLACE "Xcode ([0-9\\.]+)" "\\1" XCODE_VERSION "${XCODE_VERSION}")
 # if you don't set a deployment target it will be set the way you only get 64-bit builds
 if(NOT DEFINED DEPLOYMENT_TARGET AND XCODE_VERSION VERSION_GREATER 12.0)
   option(DROP_32_BIT "Will make drop 32-bit support universally. On later sdks you won't be able to build 32-bit apps" yes)
+  # Temporarily fix the arm64 issues in CMake install-combined by excluding arm64 for simulator builds (needed for Apple Silicon...)
+  set(CMAKE_XCODE_ATTRIBUTE_EXCLUDED_ARCHS[sdk=iphonesimulator*] "arm64")
 endif()
 
 ######## ALIASES (DEPRECATION WARNINGS)
