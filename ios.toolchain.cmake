@@ -617,7 +617,7 @@ if(NOT IOS_TOOLCHAIN_HAS_RUN)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -DNDEBUG -O3 -ffast-math ${CMAKE_CXX_FLAGS_RELEASE}")
     set(CMAKE_C_LINK_FLAGS "${SDK_NAME_VERSION_FLAGS} -Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
     set(CMAKE_CXX_LINK_FLAGS "${SDK_NAME_VERSION_FLAGS}  -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
-    set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp")
+    set(CMAKE_ASM_FLAGS "${CFLAGS} -x assembler-with-cpp -arch ${CMAKE_OSX_ARCHITECTURES}")
 
     # In order to ensure that the updated compiler flags are used in try_compile()
     # tests, we have to forcibly set them in the CMake cache, not merely set them
