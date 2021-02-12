@@ -58,6 +58,7 @@
 #    OS64COMBINED = Build for arm64 x86_64 iphoneOS. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
 #    SIMULATOR = Build for x86 i386 iphoneOS Simulator.
 #    SIMULATOR64 = Build for x86_64 iphoneOS Simulator.
+#    SIMULATORARM64 = Build for arm64 iphoneOS Simulator.
 #    TVOS = Build for arm64 tvOS.
 #    TVOSCOMBINED = Build for arm64 x86_64 tvOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_TVOS = Build for x86_64 tvOS Simulator.
@@ -90,6 +91,7 @@
 #    OS64 = arm64 (if applicable)
 #    SIMULATOR = i386
 #    SIMULATOR64 = x86_64
+#    SIMULATORARM64 = arm64
 #    TVOS = arm64
 #    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
 #    WATCHOS = armv7k arm64_32 (if applicable)
@@ -199,6 +201,8 @@ if(NOT DEFINED PLATFORM)
       set(PLATFORM "SIMULATOR")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" AND CMAKE_OSX_SYSROOT MATCHES ".*iphonesimulator.*")
       set(PLATFORM "SIMULATOR64")
+    elseif(CMAKE_OSX_ARCHITECTURES MATCHES "arm64" AND CMAKE_OSX_SYSROOT MATCHES ".*iphonesimulator.*")
+      set(PLATFORM "SIMULATORARM64")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "arm64" AND CMAKE_OSX_SYSROOT MATCHES ".*appletvos.*")
       set(PLATFORM "TVOS")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" AND CMAKE_OSX_SYSROOT MATCHES ".*appletvsimulator.*")
@@ -273,6 +277,12 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR64")
   if(NOT ARCHS)
     set(ARCHS x86_64)
     set(APPLE_TARGET_TRIPLE_INT x86_64-apple-ios)
+  endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATORARM64")
+  set(SDK_NAME iphonesimulator)
+  if(NOT ARCHS)
+    set(ARCHS arm64)
+    set(APPLE_TARGET_TRIPLE_INT aarch64-apple-ios)
   endif()
 elseif(PLATFORM_INT STREQUAL "TVOS")
   set(SDK_NAME appletvos)
