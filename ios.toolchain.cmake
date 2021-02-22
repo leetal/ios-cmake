@@ -365,9 +365,6 @@ endif()
 # Set Xcode property for SDKROOT as well if Xcode generator is used
 if(USED_CMAKE_GENERATOR MATCHES "Xcode")
   set(CMAKE_OSX_SYSROOT "${SDK_NAME}" CACHE INTERNAL "")
-  if(NOT DEFINED CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM)
-    set(CMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM "123456789A")
-  endif()
 endif()
 
 # Specify minimum version of deployment target.
