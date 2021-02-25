@@ -65,6 +65,7 @@
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
+#    MACOSX = Build for x86_64 macOS.
 #
 # CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
 #    automatically determined from PLATFORM and xcodebuild, but
@@ -96,6 +97,7 @@
 #    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
 #    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
+#    MACOSX = x86_64
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -211,6 +213,8 @@ if(NOT DEFINED PLATFORM)
       set(PLATFORM "WATCHOS")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "i386" AND CMAKE_OSX_SYSROOT MATCHES ".*watchsimulator.*")
       set(PLATFORM "SIMULATOR_WATCHOS")
+    elseif(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" AND CMAKE_OSX_SYSROOT MATCHES ".*macos.*")
+      set(PLATFORM "MACOS")
     endif()
   endif()
   if (NOT PLATFORM)
@@ -338,6 +342,12 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
     set(ARCHS i386)
     set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos)
   endif()
+elseif(PLATFORM_INT STREQUAL "MACOSX")
+  set(SDK_NAME macosx)
+  if(NOT ARCHS)
+    set(ARCHS x86_64)
+    set(APPLE_TARGET_TRIPLE_INT x86_64-apple-macosx)
+  endif()
 else()
   message(FATAL_ERROR "Invalid PLATFORM: ${PLATFORM_INT}")
 endif()
@@ -345,6 +355,8 @@ endif()
 if(MODERN_CMAKE AND PLATFORM_INT MATCHES ".*COMBINED" AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode")
   message(FATAL_ERROR "The COMBINED options only work with Xcode generator, -G Xcode")
 endif()
+
+message(STATUS "Chosen SDK name: ${SDK_NAME}")
 
 # If user did not specify the SDK root to use, then query xcodebuild for it.
 execute_process(COMMAND xcodebuild -version -sdk ${SDK_NAME} Path
@@ -363,19 +375,23 @@ elseif(DEFINED CMAKE_OSX_SYSROOT_INT)
 endif()
 
 # Set Xcode property for SDKROOT as well if Xcode generator is used
-if(USED_CMAKE_GENERATOR MATCHES "Xcode")
-  set(CMAKE_OSX_SYSROOT "${SDK_NAME}" CACHE INTERNAL "")
-endif()
+#if(USED_CMAKE_GENERATOR MATCHES "Xcode")
+#  set(CMAKE_OSX_SYSROOT "${SDK_NAME}" CACHE INTERNAL "")
+#endif()
 
 # Specify minimum version of deployment target.
 if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM_INT STREQUAL "WATCHOS" OR PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
-    # Unless specified, SDK version 2.0 is used by default as minimum target version (watchOS).
-    set(DEPLOYMENT_TARGET "2.0"
+    # Unless specified, SDK version 4.0 is used by default as minimum target version (watchOS).
+    set(DEPLOYMENT_TARGET "4.0"
             CACHE STRING "Minimum SDK version to build for." )
+  elseif(PLATFORM_INT STREQUAL "MACOSX")
+    # Unless specified, SDK version 10.13 (High sierra) is used by default as minimum target version (macosx).
+    set(DEPLOYMENT_TARGET "10.13"
+        CACHE STRING "Minimum SDK version to build for." )
   else()
-    # Unless specified, SDK version 9.0 is used by default as minimum target version (iOS, tvOS).
-    set(DEPLOYMENT_TARGET "9.0"
+    # Unless specified, SDK version 11.0 is used by default as minimum target version (iOS, tvOS).
+    set(DEPLOYMENT_TARGET "11.0"
             CACHE STRING "Minimum SDK version to build for." )
   endif()
   message(STATUS "Using the default min-version since DEPLOYMENT_TARGET not provided!")
@@ -466,13 +482,15 @@ if(NOT CMAKE_INSTALL_NAME_TOOL)
       OUTPUT_STRIP_TRAILING_WHITESPACE)
   set(CMAKE_INSTALL_NAME_TOOL ${CMAKE_INSTALL_NAME_TOOL_INT} CACHE STRING "" ${FORCE_CACHE})
 endif()
-# Get the version of Darwin (OS X) of the host.
+# Get the version of Darwin (macosx) of the host.
 execute_process(COMMAND uname -r
   OUTPUT_VARIABLE CMAKE_HOST_SYSTEM_VERSION
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 if(SDK_NAME MATCHES "iphone")
   set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
+elseif(SDK_NAME MATCHES "macosx")
+  set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
 endif()
 # CMake 3.14+ support building for iOS, watchOS and tvOS out of the box.
 if(MODERN_CMAKE)
@@ -487,10 +505,10 @@ if(MODERN_CMAKE)
     set(CMAKE_IOS_INSTALL_COMBINED YES CACHE INTERNAL "" ${FORCE_CACHE})
     message(STATUS "Will combine built (static) artifacts into FAT lib...")
   endif()
-elseif(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.10")
+elseif(NOT DEFINED CMAKE_SYSTEM_NAME AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.10")
   # Legacy code path prior to CMake 3.14 or fallback if no SDK_NAME specified
   set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
-else()
+elseif(NOT DEFINED CMAKE_SYSTEM_NAME)
   # Legacy code path prior to CMake 3.14 or fallback if no SDK_NAME specified
   set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
 endif()
@@ -503,7 +521,7 @@ set(CMAKE_AR ar CACHE FILEPATH "" FORCE)
 set(CMAKE_RANLIB ranlib CACHE FILEPATH "" FORCE)
 set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 # Set the architectures for which to build.
-set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture for iOS")
+set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture")
 # Change the type of target generated for try_compile() so it'll work when cross-compiling, weak compiler checks
 if(ENABLE_STRICT_TRY_COMPILE_INT)
   message(STATUS "Using strict compiler checks (default in CMake).")
@@ -567,6 +585,9 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11")
   elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
     set(SDK_NAME_VERSION_FLAGS
       "-mwatchos-simulator-version-min=${DEPLOYMENT_TARGET}")
+  elseif(PLATFORM_INT STREQUAL "MACOSX")
+    set(SDK_NAME_VERSION_FLAGS
+        "-mmacosx-version-min=${DEPLOYMENT_TARGET}")
   else()
     # SIMULATOR or SIMULATOR64 both use -mios-simulator-version-min.
     set(SDK_NAME_VERSION_FLAGS
