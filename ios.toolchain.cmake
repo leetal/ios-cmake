@@ -68,7 +68,9 @@
 #    MAC = Build for x86_64 macOS.
 #    MAC_ARM64 = Build for Apple Silicon macOS.
 #    MAC_CATALYST = Build for x86_64 macOS with Catalyst support (iOS toolchain on macOS).
+#                   Note: The build argument "MACOSX_DEPLOYMENT_TARGET" can be used to control min-version of macOS
 #    MAC_CATALYST_ARM64 = Build for Apple Silicon macOS with Catalyst support (iOS toolchain on macOS).
+#                         Note: The build argument "MACOSX_DEPLOYMENT_TARGET" can be used to control min-version of macOS
 #
 # CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
 #    automatically determined from PLATFORM and xcodebuild, but
@@ -152,6 +154,7 @@ list(APPEND _supported_platforms
 # Cache what generator is used
 set(USED_CMAKE_GENERATOR "${CMAKE_GENERATOR}" CACHE STRING "Expose CMAKE_GENERATOR" FORCE)
 
+# Check if using a CMake version capable of building combined FAT builds (simulator and target slices combined in one static lib)
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
   set(MODERN_CMAKE YES)
 endif()
@@ -226,14 +229,19 @@ if(NOT DEFINED PLATFORM)
   message(FATAL_ERROR "PLATFORM argument not set. Bailing configure since I don't know what target you want to build for!")
 endif()
 
-set(PLATFORM_INT "${PLATFORM}" CACHE STRING "Type of platform for which the build targets.")
-
 # Safeguard that the platform value is set and is one of the supported values
-list(FIND _supported_platforms ${PLATFORM_INT} contains_PLATFORM)
+list(FIND _supported_platforms ${PLATFORM} contains_PLATFORM)
 if("${contains_PLATFORM}" EQUAL "-1")
   string(REPLACE ";"  "\n * " _supported_platforms_formatted "${_supported_platforms}")
-  message(FATAL_ERROR " Invalid PLATFORM specified! Current value: ${PLATFORM_INT}.\n"
+  message(FATAL_ERROR " Invalid PLATFORM specified! Current value: ${PLATFORM}.\n"
       " Supported PLATFORM values: \n * ${_supported_platforms_formatted}")
+endif()
+
+set(PLATFORM_INT "${PLATFORM}" CACHE STRING "Type of platform for which the build targets.")
+
+# Check if Apple Silicon is supported
+if(PLATFORM_INT MATCHES "^(MAC_ARM64)$|^(MAC_CATALYST_ARM64)$" AND ${CMAKE_VERSION} VERSION_LESS "3.19.5")
+  message(FATAL_ERROR "Apple Silicon builds requires a minimum of CMake 3.19.5")
 endif()
 
 # Specify minimum version of deployment target.
@@ -373,7 +381,7 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
     set(ARCHS i386)
     set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos)
   endif()
-elseif(PLATFORM_INT MATCHES "(MAC|MAC_CATALYST)")
+elseif(PLATFORM_INT MATCHES "^(MAC)$|^(MAC_CATALYST)$")
   set(SDK_NAME macosx)
   if(NOT ARCHS)
     set(ARCHS x86_64)
@@ -382,36 +390,16 @@ elseif(PLATFORM_INT MATCHES "(MAC|MAC_CATALYST)")
     set(APPLE_TARGET_TRIPLE_INT x86_64-apple-macosx)
   elseif(PLATFORM_INT STREQUAL "MAC_CATALYST")
     set(APPLE_TARGET_TRIPLE_INT x86_64-apple-ios${DEPLOYMENT_TARGET}-macabi)
-    if(USED_CMAKE_GENERATOR MATCHES "Xcode")
-      set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-      set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "macosx")
-      set(CMAKE_XCODE_EFFECTIVE_PLATFORMS "-maccatalyst")
-      if(NOT DEFINED MACOSX_DEPLOYMENT_TARGET)
-        set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.15")
-      else()
-        set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "${MACOSX_DEPLOYMENT_TARGET}")
-      endif()
-    endif()
   endif()
-elseif(PLATFORM_INT MATCHES "(MAC_ARM64|MAC_CATALYST_ARM64)")
+elseif(PLATFORM_INT MATCHES "^(MAC_ARM64)$|^(MAC_CATALYST_ARM64)$")
   set(SDK_NAME macosx)
   if(NOT ARCHS)
-    set(ARCHS x86_64)
+    set(ARCHS arm64)
   endif()
-  if(PLATFORM_INT STREQUAL "MAC")
-    set(APPLE_TARGET_TRIPLE_INT x86_64-apple-macosx)
-  elseif(PLATFORM_INT STREQUAL "MAC_CATALYST")
-    set(APPLE_TARGET_TRIPLE_INT x86_64-apple-ios${DEPLOYMENT_TARGET}-macabi)
-    if(USED_CMAKE_GENERATOR MATCHES "Xcode")
-      set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-      set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "macosx")
-      set(CMAKE_XCODE_EFFECTIVE_PLATFORMS "-maccatalyst")
-      if(NOT DEFINED MACOSX_DEPLOYMENT_TARGET)
-        set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.15")
-      else()
-        set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "${MACOSX_DEPLOYMENT_TARGET}")
-      endif()
-    endif()
+  if(PLATFORM_INT STREQUAL "MAC_ARM64")
+    set(APPLE_TARGET_TRIPLE_INT arm64-apple-macosx)
+  elseif(PLATFORM_INT STREQUAL "MAC_CATALYST_ARM64")
+    set(APPLE_TARGET_TRIPLE_INT arm64-apple-ios${DEPLOYMENT_TARGET}-macabi)
   endif()
 else()
   message(FATAL_ERROR "Invalid PLATFORM: ${PLATFORM_INT}")
@@ -419,6 +407,17 @@ endif()
 
 if(MODERN_CMAKE AND PLATFORM_INT MATCHES ".*COMBINED" AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode")
   message(FATAL_ERROR "The COMBINED options only work with Xcode generator, -G Xcode")
+endif()
+
+if(USED_CMAKE_GENERATOR MATCHES "Xcode" AND PLATFORM_INT MATCHES "MAC_CATALYST_.*")
+  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+  set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "macosx")
+  set(CMAKE_XCODE_EFFECTIVE_PLATFORMS "-maccatalyst")
+  if(NOT DEFINED MACOSX_DEPLOYMENT_TARGET)
+    set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.15")
+  else()
+    set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "${MACOSX_DEPLOYMENT_TARGET}")
+  endif()
 endif()
 
 message(STATUS "Chosen SDK name: ${SDK_NAME}")
