@@ -5,5 +5,5 @@
 int main(int argc, char** argv)
 {
     HelloWorld hw;
-    std::cout << hw.helloWorld() << std::endl;;
+    std::cout << hw.helloWorld() << std::endl;
 }
