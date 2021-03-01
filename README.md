@@ -1,6 +1,4 @@
-A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development with full simulator support and
- toggleable
- options!
+A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development with full simulator support and toggleable options!
 
 ### NEW!
 * Experimental Catalyst support (iOS on macOS)
@@ -18,20 +16,7 @@ Tested with the following combinations:
 * XCode 10.2, iOS SDK 12.2
 * XCode 11.1, iOS SDK 13.1
 * XCode 11.3, iOS SDK 13.3
-* XCode 12.2, iOS SDK 14.2
-
-# Example usage 
-**NOTE: Change the `-DPLATFORM` to an applicable value if targeting another platform.**
-
-```bash
-cd example/example-lib
-mkdir build
-cd build
-cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS64
-cmake --build . --config Release
-```
-
-This will build and install the library for the given PLATFORM. In this case, iOS arm64 builds.
+* XCode 12.4, iOS/iPadOS SDK 14.4, tvOS 14.3, watchOS 7.2, macOS SDK 11.1
 
 ## Platform flag options (-DPLATFORM=_flag_)
 
@@ -52,6 +37,19 @@ This will build and install the library for the given PLATFORM. In this case, iO
 * _MAC_CATALYST_ - to build iOS for Mac (Catalyst, x86_64)
 * _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64)
 
+# Example usage 
+**_NOTE_: Change the `-DPLATFORM` to an applicable value if targeting another platform.**
+
+```bash
+cd example/example-lib
+mkdir build
+cd build
+cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS64
+cmake --build . --config Release
+```
+
+This will build and install the library for the given PLATFORM. In this case, iOS with the arm64 architecture.
+
 ### COMBINED Options
 The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) will build complete FAT-libraries for 
 the given platform. These FAT-libraries include slices for both device and simulator, making the distribution and 
@@ -63,7 +61,10 @@ cmake . -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS6
 cmake --build . --config Release
 cmake --install . --config Release
 ```
-**NOTE: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode)**
+
+**_NOTE_: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode)**
+
+---
 
 ### Exposed Variables
 `XCODE_VERSION` - Version number (not including Build version) of Xcode detected.
