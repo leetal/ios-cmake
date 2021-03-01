@@ -478,7 +478,7 @@ endif()
 set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL
     "Whether or not to use strict compiler checks" ${FORCE_CACHE})
 # Get the SDK version information.
-execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT} -version SDKVersion
+execute_process(COMMAND xcodebuild -sdk ${CMAKE_OSX_SYSROOT_INT} -version SDKVersion
   OUTPUT_VARIABLE SDK_VERSION
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -490,7 +490,7 @@ set_property(GLOBAL PROPERTY SDK_VERSION "${SDK_VERSION}")
 # CMAKE_OSX_SYSROOT. There does not appear to be a direct way to obtain
 # this information from xcrun or xcodebuild.
 if (NOT DEFINED CMAKE_DEVELOPER_ROOT AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode")
-  get_filename_component(PLATFORM_SDK_DIR ${CMAKE_OSX_SYSROOT} PATH)
+  get_filename_component(PLATFORM_SDK_DIR ${CMAKE_OSX_SYSROOT_INT} PATH)
   get_filename_component(CMAKE_DEVELOPER_ROOT ${PLATFORM_SDK_DIR} PATH)
   if (NOT DEFINED CMAKE_DEVELOPER_ROOT)
     message(FATAL_ERROR "Invalid CMAKE_DEVELOPER_ROOT: "
@@ -499,21 +499,21 @@ if (NOT DEFINED CMAKE_DEVELOPER_ROOT AND NOT USED_CMAKE_GENERATOR MATCHES "Xcode
 endif()
 # Find the C & C++ compilers for the specified SDK.
 if(NOT CMAKE_C_COMPILER)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT} -find clang
+  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find clang
     OUTPUT_VARIABLE CMAKE_C_COMPILER
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   message(STATUS "Using C compiler: ${CMAKE_C_COMPILER}")
 endif()
 if(NOT CMAKE_CXX_COMPILER)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT} -find clang++
+  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find clang++
     OUTPUT_VARIABLE CMAKE_CXX_COMPILER
     ERROR_QUIET
     OUTPUT_STRIP_TRAILING_WHITESPACE)
   message(STATUS "Using CXX compiler: ${CMAKE_CXX_COMPILER}")
 endif()
 # Find (Apple's) libtool.
-execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT} -find libtool
+execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find libtool
   OUTPUT_VARIABLE BUILD_LIBTOOL
   ERROR_QUIET
   OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -527,7 +527,7 @@ set(CMAKE_CXX_CREATE_STATIC_LIBRARY
   "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
 # Find the toolchain's provided install_name_tool if none is found on the host
 if(NOT CMAKE_INSTALL_NAME_TOOL)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT} -find install_name_tool
+  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find install_name_tool
       OUTPUT_VARIABLE CMAKE_INSTALL_NAME_TOOL_INT
       ERROR_QUIET
       OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -657,7 +657,7 @@ if(DEFINED APPLE_TARGET_TRIPLE_INT)
 endif()
 
 if(PLATFORM_INT STREQUAL "MAC_CATALYST")
-  set(C_TARGET_FLAGS "-target ${APPLE_TARGET_TRIPLE_INT} -isystem ${CMAKE_OSX_SYSROOT}/System/iOSSupport/usr/include")
+  set(C_TARGET_FLAGS "-target ${APPLE_TARGET_TRIPLE_INT} -isystem ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/usr/include")
 endif()
 
 if(ENABLE_BITCODE_INT)

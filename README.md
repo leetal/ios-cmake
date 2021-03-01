@@ -20,7 +20,7 @@ Tested with the following combinations:
 
 ## Platform flag options (-DPLATFORM=_flag_)
 
-* _OS_ - to build for iOS (armv7, armv7s, arm64)
+* _OS_ - to build for iOS (armv7, armv7s, arm64) **DEPRECATED in favour of OS64**
 * _OS64_ - to build for iOS (arm64 only)
 * _OS64COMBINED_ - to build for iOS & iOS Simulator (FAT lib) (arm64, x86_64)
 * _SIMULATOR_ - to build for iOS simulator 32 bit (i386) **DEPRECATED**
