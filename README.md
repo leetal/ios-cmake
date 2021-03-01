@@ -62,7 +62,7 @@ cmake --build . --config Release
 cmake --install . --config Release
 ```
 
-**_NOTE_: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode)**
+**_NOTE_: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode) on CMake versions 3.14+!**
 
 ---
 
