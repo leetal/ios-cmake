@@ -26,6 +26,7 @@ matrix:
     osx_image: xcode8.3
     env:
       - PLATFORM=OS64
+      - DEPLOYMENT_TARGET=10.0
   - os: osx
     osx_image: xcode10.2
     env:
