@@ -9,6 +9,7 @@ BUILD_SHARED=${BUILD_SHARED:-0}
 USE_XCODE=${USE_XCODE:-0}
 BUILD_CURL=${BUILD_CURL:-0}
 USE_STRICT_COMPILER_CHECKS=${USE_STRICT_COMPILER_CHECKS:-0}
+DEPLOYMENT_TARGET=${BUILD_CURL:-11.0}
 
 SHARED_EXT=""
 if [[ ${BUILD_SHARED} -eq 1 ]]; then
@@ -38,7 +39,7 @@ else
   pushd example/example-lib/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DPLATFORM=${PLATFORM} ${USE_STRICT_COMPILER_CHECKS_EXT} ${SHARED_EXT}\
+    -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} ${USE_STRICT_COMPILER_CHECKS_EXT} ${SHARED_EXT}\
    || exit 1
   cmake --build . --config Release --target install || exit 1
   popd
