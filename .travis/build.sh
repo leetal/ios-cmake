@@ -33,7 +33,7 @@ else
   mkdir -p example/example-lib/build
   pushd example/example-lib/build
   cmake .. \
-    ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
+    ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DCMAKE_INSTALL_PREFIX=../out \
     -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} ${SHARED_EXT}\
    || exit 1
   cmake --build . --config Release || exit 1
