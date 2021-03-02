@@ -21,17 +21,12 @@ if [[ ${USE_XCODE} -eq 1 ]]; then
     GENERATOR_EXT="-G Xcode"
 fi
 
-USE_STRICT_COMPILER_CHECKS_EXT=""
-if [[ ${USE_STRICT_COMPILER_CHECKS} -eq 1 ]]; then
-    USE_STRICT_COMPILER_CHECKS_EXT="-DENABLE_STRICT_TRY_COMPILE=1"
-fi
-
 if [[ ${BUILD_CURL} -eq 1 ]]; then
   mkdir -p example/example-curl/build
   pushd example/example-curl/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DPLATFORM=${PLATFORM} ${USE_STRICT_COMPILER_CHECKS_EXT} || exit 1
+    -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} || exit 1
   cmake --build . --config Release --parallel 4 || exit 1
   popd
 else
@@ -39,8 +34,9 @@ else
   pushd example/example-lib/build
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
-    -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} ${USE_STRICT_COMPILER_CHECKS_EXT} ${SHARED_EXT}\
+    -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} ${SHARED_EXT}\
    || exit 1
-  cmake --build . --config Release --target install || exit 1
+  cmake --build . --config Release || exit 1
+  cmake --install . --config Release || exit 1
   popd
 fi
