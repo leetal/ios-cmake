@@ -23,20 +23,20 @@ fi
 
 if [[ ${BUILD_CURL} -eq 1 ]]; then
   mkdir -p example/example-curl/build
-  pushd example/example-curl/build
+  pushd example/example-curl/build || exit 1
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
     -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} || exit 1
   cmake --build . --config Release --parallel 4 || exit 1
-  popd
+  popd || exit 1
 else
   mkdir -p example/example-lib/build
-  pushd example/example-lib/build
+  pushd example/example-lib/build || exit 1
   cmake .. \
     ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DCMAKE_INSTALL_PREFIX=../out \
     -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} ${SHARED_EXT}\
    || exit 1
-  cmake --build . --config Release || exit 1
-  cmake --install . --config Release || exit 1
-  popd
+  cmake --build . --config Release --target install || exit 1
+  # cmake --install . --config Release || exit 1 [TBA: Add this row when travis includes newer CMake versions in their images]
+  popd || exit 1
 fi
