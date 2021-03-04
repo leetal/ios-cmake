@@ -499,10 +499,11 @@ endif()
 # Configure libtool to be used instead of ar + ranlib to build static libraries.
 # This is required on Xcode 7+, but should also work on previous versions of
 # Xcode.
-set(CMAKE_C_CREATE_STATIC_LIBRARY
-  "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> " CACHE STRING "" ${FORCE_CACHE})
-set(CMAKE_CXX_CREATE_STATIC_LIBRARY
-  "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> " CACHE STRING "" ${FORCE_CACHE})
+get_property(languages GLOBAL PROPERTY ENABLED_LANGUAGES)
+foreach(lang ${languages})
+  set(CMAKE_${lang}_CREATE_STATIC_LIBRARY
+          "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> ")
+endforeach()
 
 # CMake 3.14+ support building for iOS, watchOS and tvOS out of the box.
 if(MODERN_CMAKE)
@@ -739,8 +740,6 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
     CMAKE_CXX_COMPILER
     BUILD_LIBTOOL
     CMAKE_INSTALL_NAME_TOOL
-    CMAKE_C_CREATE_STATIC_LIBRARY
-    CMAKE_CXX_CREATE_STATIC_LIBRARY
     )
 
 set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)

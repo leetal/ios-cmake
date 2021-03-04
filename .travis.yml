@@ -19,6 +19,51 @@ env:
   - PLATFORM=MAC DEPLOYMENT_TARGET=10.13
   - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1
 
+jobs:
+  fast_finish: true
+  include:
+    - os: osx
+      name: "Test on older Xcode versions (Version 8.3, iOS SDK 10.3)"
+      osx_image: xcode8.3
+      env:
+      - PLATFORM=OS64 DEPLOYMENT_TARGET=10.3
+    - os: osx
+      name: "Test on older Xcode versions (Version 9.4,iOS SDK 11.4)"
+      osx_image: xcode9.4
+      env:
+        - PLATFORM=OS64 DEPLOYMENT_TARGET=11.4
+    - os: osx
+      name: "Mac Catalyst example"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=MAC_CATALYST DEPLOYMENT_TARGET=13.0
+    - os: osx
+      name: "Use new *COMBINED build support in CMake 3.19.4+"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
+  exclude:
+    - osx_image: xcode10.2
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1  # Takes too much time to build...
+    - osx_image: xcode11.3
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1  # Takes too much time to build...
+    - osx_image: xcode12.2
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0
+    - osx_image: xcode10.2
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
+    - osx_image: xcode11.3
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
+  allow_failures:
+    - env:
+      - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1 # Allows failures since new Xcode build system broke Cmake and requires CMake 3.19.4+
+      - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1 # Allows failures since new Xcode build system broke Cmake and requires CMake 3.19.4+
+
+
 install: skip
 
 script:
