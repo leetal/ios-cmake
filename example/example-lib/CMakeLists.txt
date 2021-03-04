@@ -13,33 +13,18 @@ else()
   message(STATUS "kqueue found!")
 endif()
 
-if(PLATFORM MATCHES "(MAC|MAC_ARM64)")
-  find_library(HAVE_APPKIT AppKit)
-  if (NOT HAVE_APPKIT)
-    message(FATAL_ERROR "AppKit.framework NOT found!")
-  else()
-    message(STATUS "AppKit.framework found!")
-  endif()
-elseif(PLATFORM MATCHES "(MAC_CATALYST|MAC_CATALYST_ARM64)")
-  find_library(HAVE_APPKIT AppKit)
-  if (NOT HAVE_APPKIT)
-    message(FATAL_ERROR "AppKit.framework NOT found!")
-  else()
-    message(STATUS "AppKit.framework found!")
-  endif()
-  find_library(HAVE_UIKIT UIKit)
-  if (NOT HAVE_UIKIT)
-    message(FATAL_ERROR "UIKit.framework NOT found!")
-  else()
-    message(STATUS "UIKit.framework found!")
-  endif()
+find_library(HAVE_APPKIT AppKit)
+if (NOT HAVE_APPKIT)
+  message(STATUS "AppKit.framework NOT found!")
 else()
-  find_library(HAVE_UIKIT UIKit)
-  if (NOT HAVE_UIKIT)
-    message(FATAL_ERROR "UIKit.framework NOT found!")
-  else()
-    message(STATUS "UIKit.framework found!")
-  endif()
+  message(STATUS "AppKit.framework found!")
+endif()
+
+find_library(HAVE_UIKIT UIKit)
+if (NOT HAVE_UIKIT)
+  message(STATUS "UIKit.framework NOT found!")
+else()
+  message(STATUS "UIKit.framework found!")
 endif()
 
 # Hook up XCTest for the supported plaforms (all but WatchOS)
@@ -72,6 +57,7 @@ set(HEADERS
 # Library
 if(BUILD_SHARED)
   add_library (example SHARED ${SOURCES} ${HEADERS})
+  target_compile_definitions(example PUBLIC IS_BUILDING_SHARED)
   message(STATUS "Building shared version...")
 else()
   add_library (example STATIC ${SOURCES} ${HEADERS})
@@ -84,14 +70,44 @@ endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 # Executable
 if(PLATFORM MATCHES "MAC.*")
-  add_executable (helloworld main.cpp)
+  set(APP_NAME TestApp)
+  add_executable (${APP_NAME} MACOSX_BUNDLE main.cpp)
+  set_target_properties(${APP_NAME} PROPERTIES
+          BUNDLE True
+          MACOSX_BUNDLE_GUI_IDENTIFIER leetal.com.helloworld
+          MACOSX_BUNDLE_BUNDLE_NAME helloworld
+          MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
+          MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+          )
   # Link the library with the executable
-  target_link_libraries(helloworld example)
+  target_link_libraries(${APP_NAME} example)
 endif()
 
 # Debug symbols set in XCode project
 set_xcode_property(example GCC_GENERATE_DEBUGGING_SYMBOLS YES "All")
 
 # Installation
-install (TARGETS example DESTINATION lib)
+if(PLATFORM MATCHES "MAC.*")
+  install(TARGETS ${APP_NAME}
+          BUNDLE DESTINATION . COMPONENT Runtime
+          RUNTIME DESTINATION bin COMPONENT Runtime
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib/static)
+
+  # Note Mac specific extension .app
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/${APP_NAME}.app")
+
+  # Directories to look for dependencies
+  set(DIRS ${CMAKE_BINARY_DIR})
+
+  install(CODE "include(BundleUtilities)
+    fixup_bundle(\"${APPS}\" \"\" \"${DIRS}\")")
+
+  set(CPACK_GENERATOR "DRAGNDROP")
+  include(CPack)
+else()
+  install(TARGETS example
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib/static)
+endif()
 install (FILES ${HEADERS} DESTINATION include)
