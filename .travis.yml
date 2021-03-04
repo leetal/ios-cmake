@@ -74,6 +74,11 @@ jobs:
       osx_image: xcode12.2
       env:
         - PLATFORM=MAC DEPLOYMENT_TARGET=10.13
+    - name: "Xcode version 12.2, Target macOS [x86_64] SDK 10.13 [shared example]"
+      stage: "macOS builds"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=MAC DEPLOYMENT_TARGET=10.13 -DBUILD_SHARED=1
     - name: "Xcode version 12.2, Target macOS on Apple Silicon [arm64] SDK 11.0 [allowed failure]"
       stage: "macOS builds"
       osx_image: xcode12.2
