@@ -2,67 +2,106 @@ language: objective-c
 
 os:
   - osx
-osx_image:
-  - xcode10.2
-  - xcode11.3
-  - xcode12.2
-env:
-  - PLATFORM=SIMULATOR DEPLOYMENT_TARGET=11.0
-  - PLATFORM=SIMULATOR64 DEPLOYMENT_TARGET=11.0
-  - PLATFORM=OS DEPLOYMENT_TARGET=11.0
-  - PLATFORM=OS BUILD_SHARED=1 DEPLOYMENT_TARGET=11.0
-  - PLATFORM=OS64 DEPLOYMENT_TARGET=11.0
-  - PLATFORM=OS64 BUILD_SHARED=1 DEPLOYMENT_TARGET=11.0
-  - PLATFORM=TVOS DEPLOYMENT_TARGET=11.0
-  - PLATFORM=WATCHOS DEPLOYMENT_TARGET=5.0
-  - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0
-  - PLATFORM=MAC DEPLOYMENT_TARGET=10.13
-  - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1
-  - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
 
 jobs:
   fast_finish: true
+  allow_failures:
+    - name: "Use new *COMBINED build support in CMake 3.19.4+ [allowed failure]"
+    - name: "Mac Catalyst on Apple Silicon, Target iOS 13.0 [arm64] [allowed failure]"
+    - name: "Xcode version 12.2, Target macOS on Apple Silicon [arm64] SDK 11.0 [allowed failure]"
   include:
-    - os: osx
-      name: "Test on older Xcode versions (Version 8.3, iOS SDK 10.3)"
+    - name: "Xcode version 8.3, Target iOS [arm64] SDK 9.0"
+      stage: "iOS builds"
       osx_image: xcode8.3
       env:
-      - PLATFORM=OS64 DEPLOYMENT_TARGET=10.3
-    - os: osx
-      name: "Test on older Xcode versions (Version 9.4,iOS SDK 11.4)"
+        - PLATFORM=OS64 DEPLOYMENT_TARGET=9.0
+    - name: "Xcode version 9.4, Target iOS [arm64] SDK 9.0"
+      stage: "iOS builds"
       osx_image: xcode9.4
       env:
-        - PLATFORM=OS64 DEPLOYMENT_TARGET=11.4
-    - os: osx
-      name: "Mac Catalyst example"
+        - PLATFORM=OS64 DEPLOYMENT_TARGET=9.0
+    - name: "Xcode version 9.4, Target iOS [arm64] SDK 11.0"
+      stage: "iOS builds"
+      osx_image: xcode10.2
+      env:
+        - PLATFORM=OS64 DEPLOYMENT_TARGET=11.0
+    - name: "Xcode version 9.4, Target iOS [armv7, armv7k, arm64] SDK 9.0"
+      stage: "iOS builds"
+      osx_image: xcode10.2
+      env:
+        - PLATFORM=OS DEPLOYMENT_TARGET=9.0
+    - name: "Xcode version 11.3, Target iOS Simulator64 [x86_64] SDK 12.0"
+      stage: "iOS builds"
+      osx_image: xcode11.3
+      env:
+        - PLATFORM=SIMULATOR64 DEPLOYMENT_TARGET=12.0
+
+    - name: "Xcode version 11.3, Target watchOS [armv7k,arm64_32] SDK 5.0"
+      stage: "watchOS builds"
+      osx_image: xcode11.3
+      env:
+        - PLATFORM=WATCHOS DEPLOYMENT_TARGET=5.0
+    - name: "Xcode version 12.2, Target watchOS Simulator [x86_64] SDK 7.0"
+      stage: "watchOS builds"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=SIMULATOR_WATCHOS DEPLOYMENT_TARGET=7.0
+
+    - name: "Xcode version 11.3, Target tvOS [arm64] SDK 11.0"
+      stage: "tvOS builds"
+      osx_image: xcode11.3
+      env:
+        - PLATFORM=TVOS DEPLOYMENT_TARGET=11.0
+
+    - name: "Xcode version 11.3, Target iOS Combined Build [x86_64, arm64] SDK 12.0"
+      stage: "Combined builds"
+      osx_image: xcode11.3
+      env:
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=12.0
+    - name: "Xcode version 11.3, Target watchOS [armv7k, arm64_32, x86_64] SDK 5.0"
+      stage: "Combined builds"
+      osx_image: xcode11.3
+      env:
+        - PLATFORM=WATCHOSCOMBINED USE_XCODE=1 DEPLOYMENT_TARGET=5.0
+    - name: "Xcode version 11.3, Target tvOS [arm64, x86_64] SDK 11.0"
+      stage: "Combined builds"
+      osx_image: xcode11.3
+      env:
+        - PLATFORM=TVOSCOMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0
+
+    - name: "Xcode version 12.2, Target macOS [x86_64] SDK 10.13"
+      stage: "macOS builds"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=MAC DEPLOYMENT_TARGET=10.13
+    - name: "Xcode version 12.2, Target macOS on Apple Silicon [arm64] SDK 11.0 [allowed failure]"
+      stage: "macOS builds"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=MAC_ARM64 DEPLOYMENT_TARGET=11.0
+
+    - name: "Mac Catalyst, iOS target 13.0 [x86_64]"
+      stage: "Mac Catalyst builds"
       osx_image: xcode12.2
       env:
         - PLATFORM=MAC_CATALYST DEPLOYMENT_TARGET=13.0
-    - os: osx
-      name: "Use new *COMBINED build support in CMake 3.19.4+"
+    - name: "Mac Catalyst on Apple Silicon, Target iOS 13.0 [arm64] [allowed failure]"
+      stage: "Mac Catalyst builds"
+      osx_image: xcode12.2
+      env:
+        - PLATFORM=MAC_CATALYST_ARM64 DEPLOYMENT_TARGET=13.0
+
+    - name: "Use new *COMBINED build support in CMake 3.19.4+ [allowed failure]"
+      stage: "New build system combined builds"
       osx_image: xcode12.2
       env:
         - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
-  exclude:
-    - osx_image: xcode10.2
+
+    - name: "libCURL example combined build on iOS"
+      stage: "libCURL example builds"
+      osx_image: xcode11.3
       env:
-        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1  # Takes too much time to build...
-    - osx_image: xcode11.3
-      env:
-        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1  # Takes too much time to build...
-    - osx_image: xcode12.2
-      env:
-        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0
-    - osx_image: xcode10.2
-      env:
-        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
-    - osx_image: xcode11.3
-      env:
-        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
-  allow_failures:
-    - env:
-      - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1
-      - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
+        - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1
 
 install: skip
 
