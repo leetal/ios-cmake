@@ -1,62 +1,25 @@
 language: objective-c
 
-matrix:
-  include:
-  - os: osx
-    osx_image: xcode11.3
-    env:
-      - PLATFORM=SIMULATOR DEPLOYMENT_TARGET=13.1
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=SIMULATOR64 DEPLOYMENT_TARGET=12.1
-  - os: osx
-    osx_image: xcode11.1
-    env:
-      - PLATFORM=OS DEPLOYMENT_TARGET=13.0
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=OS64 DEPLOYMENT_TARGET=12.0
-  - os: osx
-    osx_image: xcode9.4
-    env:
-      - PLATFORM=OS64 DEPLOYMENT_TARGET=11.0
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=OS BUILD_SHARED=1 DEPLOYMENT_TARGET=12.0
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=TVOS DEPLOYMENT_TARGET=11.0
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=WATCHOS DEPLOYMENT_TARGET=5.0
-  - os: osx
-    osx_image: xcode10.2
-    env:
-      - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0
-  - os: osx
-    osx_image: xcode12.2
-    env:
-      - PLATFORM=OS64 BUILD_SHARED=1 DEPLOYMENT_TARGET=12.0
-  allow_failures:
-  - os: osx
-    osx_image: xcode12.2
-    env:
-      - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=14.0
-  - os: osx
-    osx_image: xcode11.3
-    env:
-      - PLATFORM=OS64COMBINED BUILD_CURL=1 USE_XCODE=1 DEPLOYMENT_TARGET=11.0
-  - os: osx
-    osx_image: xcode12.2
-    env:
-      - PLATFORM=MAC DEPLOYMENT_TARGET=10.14
+os:
+  - osx
+osx_image:
+  - xcode10.2
+  - xcode11.3
+  - xcode12.2
+env:
+  - PLATFORM=SIMULATOR DEPLOYMENT_TARGET=11.0
+  - PLATFORM=SIMULATOR64 DEPLOYMENT_TARGET=11.0
+  - PLATFORM=OS DEPLOYMENT_TARGET=11.0
+  - PLATFORM=OS BUILD_SHARED=1 DEPLOYMENT_TARGET=11.0
+  - PLATFORM=OS64 DEPLOYMENT_TARGET=11.0
+  - PLATFORM=OS64 BUILD_SHARED=1 DEPLOYMENT_TARGET=11.0
+  - PLATFORM=TVOS DEPLOYMENT_TARGET=11.0
+  - PLATFORM=WATCHOS DEPLOYMENT_TARGET=5.0
+  - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0
+  - PLATFORM=MAC DEPLOYMENT_TARGET=10.13
+  - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 BUILD_CURL=1
 
-install: true
+install: skip
 
 script:
   - ./.travis/build.sh
