@@ -491,9 +491,10 @@ endif()
 # Find the toolchain's provided install_name_tool if none is found on the host
 if(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
   execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find install_name_tool
-          OUTPUT_VARIABLE CMAKE_INSTALL_NAME_TOOL
+          OUTPUT_VARIABLE CMAKE_INSTALL_NAME_TOOL_INT
           ERROR_QUIET
           OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(CMAKE_INSTALL_NAME_TOOL ${CMAKE_INSTALL_NAME_TOOL_INT} CACHE STRING "" ${FORCE_CACHE})
 endif()
 
 # Configure libtool to be used instead of ar + ranlib to build static libraries.
