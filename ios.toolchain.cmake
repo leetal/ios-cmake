@@ -145,12 +145,6 @@ option(DROP_32_BIT "Drops the 32-bit targets universally." YES)
 #                                END OPTIONS                                  #
 ###############################################################################
 
-# Fix for PThread library not in path
-set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-set(CMAKE_HAVE_THREADS_LIBRARY 1)
-set(CMAKE_USE_WIN32_THREADS_INIT 0)
-set(CMAKE_USE_PTHREADS_INIT 1)
-
 # List of supported platform values
 list(APPEND _supported_platforms
         "OS" "OS64" "OS64COMBINED" "SIMULATOR" "SIMULATOR64" "SIMULATORARM64"
@@ -160,7 +154,7 @@ list(APPEND _supported_platforms
         "MAC_CATALYST" "MAC_CATALYST_ARM64")
 
 # Cache what generator is used
-set(USED_CMAKE_GENERATOR "${CMAKE_GENERATOR}" CACHE STRING "Expose CMAKE_GENERATOR" ${FORCE_CACHE})
+set(USED_CMAKE_GENERATOR "${CMAKE_GENERATOR}")
 
 # Check if using a CMake version capable of building combined FAT builds (simulator and target slices combined in one static lib)
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.14")
@@ -184,7 +178,7 @@ elseif(NOT DEFINED XCODE_VERSION)
           OUTPUT_STRIP_TRAILING_WHITESPACE)
   string(REGEX MATCH "Xcode [0-9\\.]+" XCODE_VERSION "${XCODE_VERSION}")
   string(REGEX REPLACE "Xcode ([0-9\\.]+)" "\\1" XCODE_VERSION "${XCODE_VERSION}")
-  set(XCODE_VERSION "${XCODE_VERSION}" CACHE STRING "" ${FORCE_CACHE})
+  set(XCODE_VERSION "${XCODE_VERSION}")
 endif()
 
 # Assuming that xcode 12.0 is installed you most probably have ios sdk 14.2 or later installed (tested on Big Sur)
@@ -192,13 +186,6 @@ endif()
 if(NOT DEFINED DEPLOYMENT_TARGET AND XCODE_VERSION VERSION_GREATER 12.0)
   # Temporarily fix the arm64 issues in CMake install-combined by excluding arm64 for simulator builds (needed for Apple Silicon...)
   set(CMAKE_XCODE_ATTRIBUTE_EXCLUDED_ARCHS[sdk=iphonesimulator*] "arm64")
-endif()
-
-# Unset the FORCE on cache variables if in try_compile()
-set(FORCE_CACHE FORCE)
-get_property(_CMAKE_IN_TRY_COMPILE GLOBAL PROPERTY IN_TRY_COMPILE)
-if(_CMAKE_IN_TRY_COMPILE)
-  unset(FORCE_CACHE)
 endif()
 
 # Check if the platform variable is set
@@ -224,28 +211,42 @@ if(PLATFORM MATCHES "^(MAC_ARM64)$|^(MAC_CATALYST_ARM64)$" AND ${CMAKE_VERSION} 
   message(FATAL_ERROR "Apple Silicon builds requires a minimum of CMake 3.19.5")
 endif()
 
+# Touch toolchain variable to suppress "unused variable" warning.
+# This happens if CMake is invoked with the same command line the second time.
+if(CMAKE_TOOLCHAIN_FILE)
+endif()
+
+# Fix for PThread library not in path
+set(CMAKE_THREAD_LIBS_INIT "-lpthread")
+set(CMAKE_HAVE_THREADS_LIBRARY 1)
+set(CMAKE_USE_WIN32_THREADS_INIT 0)
+set(CMAKE_USE_PTHREADS_INIT 1)
+
 # Specify minimum version of deployment target.
 if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM STREQUAL "WATCHOS" OR PLATFORM STREQUAL "SIMULATOR_WATCHOS")
     # Unless specified, SDK version 4.0 is used by default as minimum target version (watchOS).
-    set(DEPLOYMENT_TARGET "4.0" CACHE STRING "Minimum SDK version to build for.")
+    set(DEPLOYMENT_TARGET "4.0")
   elseif(PLATFORM MATCHES "MAC")
     # Unless specified, SDK version 10.13 (High sierra) is used by default as minimum target version (macos).
-    set(DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum SDK version to build for.")
+    set(DEPLOYMENT_TARGET "10.13")
   elseif(PLATFORM STREQUAL "MAC_ARM64")
     # Unless specified, SDK version 11.0 (Big Sur) is used by default as minimum target version (macos on arm).
-    set(DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum SDK version to build for.")
+    set(DEPLOYMENT_TARGET "11.0")
   elseif(PLATFORM MATCHES "(MAC_CATALYST|MAC_CATALYST_ARM64)")
     # Unless specified, SDK version 13.0 is used by default as minimum target version (mac catalyst minimum requirement).
-    set(DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum SDK version to build for.")
+    set(DEPLOYMENT_TARGET "13.0")
   else()
     # Unless specified, SDK version 11.0 is used by default as minimum target version (iOS, tvOS).
-    set(DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum SDK version to build for.")
+    set(DEPLOYMENT_TARGET "11.0")
   endif()
   message(STATUS "[DEFAULTS] Using the default min-version since DEPLOYMENT_TARGET not provided!")
 elseif(DEFINED DEPLOYMENT_TARGET AND PLATFORM STREQUAL "MAC_CATALYST" AND ${DEPLOYMENT_TARGET} VERSION_LESS "13.0")
   message(FATAL_ERROR "Mac Catalyst builds requires a minimum deployment target of 13.0!")
 endif()
+
+# Store the DEPLOYMENT_TARGET in the cache
+set(DEPLOYMENT_TARGET "${DEPLOYMENT_TARGET}" CACHE INTERNAL "")
 
 # Handle the case where we are targeting iOS and a version above 10.3.4 (32-bit support dropped officially)
 if(PLATFORM STREQUAL "OS" AND DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 10.3.4)
@@ -256,7 +257,7 @@ elseif(PLATFORM STREQUAL "SIMULATOR" AND DEPLOYMENT_TARGET VERSION_GREATER_EQUAL
   message(STATUS "Targeting minimum SDK version ${DEPLOYMENT_TARGET}. Dropping 32-bit support.")
 endif()
 
-set(PLATFORM_INT "${PLATFORM}" CACHE STRING "Type of platform for which the build targets.")
+set(PLATFORM_INT "${PLATFORM}")
 
 # Determine the platform name and architectures for use in xcodebuild commands
 # from the specified PLATFORM_INT name.
@@ -423,8 +424,8 @@ if (NOT DEFINED CMAKE_OSX_SYSROOT_INT AND NOT DEFINED CMAKE_OSX_SYSROOT)
   message(FATAL_ERROR "Invalid CMAKE_OSX_SYSROOT: ${CMAKE_OSX_SYSROOT} "
           "does not exist.")
 elseif(DEFINED CMAKE_OSX_SYSROOT_INT)
-  set(CMAKE_OSX_SYSROOT_INT "${CMAKE_OSX_SYSROOT_INT}" CACHE INTERNAL "" ${FORCE_CACHE})
-  set(CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT_INT}" CACHE INTERNAL "" ${FORCE_CACHE})
+  set(CMAKE_OSX_SYSROOT_INT "${CMAKE_OSX_SYSROOT_INT}" CACHE INTERNAL "")
+  set(CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT_INT}")
 endif()
 
 # Set Xcode property for SDKROOT as well if Xcode generator is used
@@ -442,14 +443,14 @@ elseif(NOT DEFINED ENABLE_BITCODE)
   set(ENABLE_BITCODE FALSE)
 endif()
 set(ENABLE_BITCODE_INT ${ENABLE_BITCODE} CACHE BOOL
-        "Whether or not to enable bitcode" ${FORCE_CACHE})
+        "Whether or not to enable bitcode" FORCE)
 # Use ARC or not
 if(NOT DEFINED ENABLE_ARC)
   # Unless specified, enable ARC support by default
   set(ENABLE_ARC TRUE)
   message(STATUS "[DEFAULTS] Enabling ARC support by default. ENABLE_ARC not provided!")
 endif()
-set(ENABLE_ARC_INT ${ENABLE_ARC} CACHE BOOL "Whether or not to enable ARC" ${FORCE_CACHE})
+set(ENABLE_ARC_INT ${ENABLE_ARC} CACHE BOOL "Whether or not to enable ARC" FORCE)
 # Use hidden visibility or not
 if(NOT DEFINED ENABLE_VISIBILITY)
   # Unless specified, disable symbols visibility by default
@@ -457,7 +458,7 @@ if(NOT DEFINED ENABLE_VISIBILITY)
   message(STATUS "[DEFAULTS] Hiding symbols visibility by default. ENABLE_VISIBILITY not provided!")
 endif()
 set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL
-        "Whether or not to hide symbols (-fvisibility=hidden)" ${FORCE_CACHE})
+        "Whether or not to hide symbols (-fvisibility=hidden)" FORCE)
 # Set strict compiler checks or not
 if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
   # Unless specified, disable strict try_compile()
@@ -465,7 +466,7 @@ if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
   message(STATUS "[DEFAULTS] Using NON-strict compiler checks by default. ENABLE_STRICT_TRY_COMPILE not provided!")
 endif()
 set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL
-        "Whether or not to use strict compiler checks" ${FORCE_CACHE})
+        "Whether or not to use strict compiler checks" FORCE)
 
 # Get the SDK version information.
 if(DEFINED SDK_VERSION)
@@ -539,7 +540,7 @@ elseif(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
           OUTPUT_VARIABLE CMAKE_INSTALL_NAME_TOOL_INT
           ERROR_QUIET
           OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set(CMAKE_INSTALL_NAME_TOOL ${CMAKE_INSTALL_NAME_TOOL_INT} CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_INSTALL_NAME_TOOL ${CMAKE_INSTALL_NAME_TOOL_INT} CACHE INTERNAL "")
 endif()
 
 # Configure libtool to be used instead of ar + ranlib to build static libraries.
@@ -554,37 +555,37 @@ endforeach()
 # CMake 3.14+ support building for iOS, watchOS and tvOS out of the box.
 if(MODERN_CMAKE)
   if(SDK_NAME MATCHES "iphone")
-    set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
+    set(CMAKE_SYSTEM_NAME iOS)
   elseif(SDK_NAME MATCHES "macosx")
-    set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
+    set(CMAKE_SYSTEM_NAME Darwin)
   elseif(SDK_NAME MATCHES "appletv")
-    set(CMAKE_SYSTEM_NAME tvOS CACHE INTERNAL "" ${FORCE_CACHE})
+    set(CMAKE_SYSTEM_NAME tvOS)
   elseif(SDK_NAME MATCHES "watch")
-    set(CMAKE_SYSTEM_NAME watchOS CACHE INTERNAL "" ${FORCE_CACHE})
+    set(CMAKE_SYSTEM_NAME watchOS)
   endif()
   # Provide flags for a combined FAT library build on newer CMake versions
   if(PLATFORM_INT MATCHES ".*COMBINED")
     set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
-    set(CMAKE_IOS_INSTALL_COMBINED YES CACHE INTERNAL "" ${FORCE_CACHE})
+    set(CMAKE_IOS_INSTALL_COMBINED YES)
     message(STATUS "Will combine built (static) artifacts into FAT lib...")
   endif()
 elseif(NOT DEFINED CMAKE_SYSTEM_NAME AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.10")
   # Legacy code path prior to CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
-  set(CMAKE_SYSTEM_NAME iOS CACHE INTERNAL "" ${FORCE_CACHE})
+  set(CMAKE_SYSTEM_NAME iOS)
 elseif(NOT DEFINED CMAKE_SYSTEM_NAME)
   # Legacy code path prior to CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
-  set(CMAKE_SYSTEM_NAME Darwin CACHE INTERNAL "" ${FORCE_CACHE})
+  set(CMAKE_SYSTEM_NAME Darwin)
 endif()
 # Standard settings.
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
 set(UNIX TRUE CACHE BOOL "")
 set(APPLE TRUE CACHE BOOL "")
 set(IOS TRUE CACHE BOOL "")
-set(CMAKE_AR ar CACHE FILEPATH "" ${FORCE_CACHE})
-set(CMAKE_RANLIB ranlib CACHE FILEPATH "" ${FORCE_CACHE})
-set(CMAKE_STRIP strip CACHE FILEPATH "" ${FORCE_CACHE})
+set(CMAKE_AR ar CACHE FILEPATH "" FORCE)
+set(CMAKE_RANLIB ranlib CACHE FILEPATH "" FORCE)
+set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 # Set the architectures for which to build.
-set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE STRING "Build architecture")
+set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE INTERNAL "")
 # Change the type of target generated for try_compile() so it'll work when cross-compiling, weak compiler checks
 if(NOT ENABLE_STRICT_TRY_COMPILE_INT)
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
@@ -656,13 +657,11 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11")
   endif()
 elseif(NOT PLATFORM_INT STREQUAL "MAC_CATALYST")
   # Newer versions of CMake sets the version min flags correctly, skip this for Mac Catalyst targets
-  set(CMAKE_OSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET} CACHE STRING
-          "Set CMake deployment target" ${FORCE_CACHE})
+  set(CMAKE_OSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
 endif()
 
 if(DEFINED APPLE_TARGET_TRIPLE_INT)
-  set(APPLE_TARGET_TRIPLE ${APPLE_TARGET_TRIPLE_INT} CACHE STRING
-          "Autoconf target triple compatible variable" ${FORCE_CACHE})
+  set(APPLE_TARGET_TRIPLE ${APPLE_TARGET_TRIPLE_INT} CACHE INTERNAL "")
 endif()
 
 if(PLATFORM_INT STREQUAL "MAC_CATALYST")
@@ -723,7 +722,7 @@ else()
           CMAKE_CXX_LINK_FLAGS
           CMAKE_ASM_FLAGS)
   foreach(VAR_TO_FORCE ${VARS_TO_FORCE_IN_CACHE})
-    set(${VAR_TO_FORCE} "${${VAR_TO_FORCE}}" CACHE STRING "" ${FORCE_CACHE})
+    set(${VAR_TO_FORCE} "${${VAR_TO_FORCE}}" CACHE INTERNAL "")
   endforeach()
 endif()
 
@@ -798,8 +797,7 @@ set(CMAKE_FIND_LIBRARY_SUFFIXES ".tbd" ".dylib" ".so" ".a")
 set(CMAKE_SHARED_LIBRARY_SONAME_C_FLAG "-install_name")
 
 # Set the find root to the iOS developer roots and to user defined paths.
-set(CMAKE_FIND_ROOT_PATH ${CMAKE_OSX_SYSROOT_INT} ${CMAKE_PREFIX_PATH} CACHE STRING
-        "Root path that will be prepended to all search paths")
+set(CMAKE_FIND_ROOT_PATH ${CMAKE_OSX_SYSROOT_INT} ${CMAKE_PREFIX_PATH} CACHE INTERNAL "")
 # Default to searching for frameworks first.
 set(CMAKE_FIND_FRAMEWORK FIRST)
 # Set up the default search directories for frameworks.
@@ -808,26 +806,26 @@ if(PLATFORM_INT MATCHES "MAC_CATALYST.*")
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/System/Library/Frameworks
-          ${CMAKE_FRAMEWORK_PATH} CACHE STRING "Frameworks search paths" ${FORCE_CACHE})
+          ${CMAKE_FRAMEWORK_PATH} CACHE INTERNAL "")
 else()
   set(CMAKE_FRAMEWORK_PATH
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
-          ${CMAKE_FRAMEWORK_PATH} CACHE STRING "Frameworks search paths" ${FORCE_CACHE})
+          ${CMAKE_FRAMEWORK_PATH} CACHE INTERNAL "")
 endif()
 
 # By default, search both the specified iOS SDK and the remainder of the host filesystem.
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE INTERNAL "")
 endif()
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_LIBRARY)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE INTERNAL "")
 endif()
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_INCLUDE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE INTERNAL "")
 endif()
 if(NOT CMAKE_FIND_ROOT_PATH_MODE_PACKAGE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE STRING "" ${FORCE_CACHE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE INTERNAL "")
 endif()
 
 #
