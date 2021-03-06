@@ -809,11 +809,11 @@ set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".tbd" ".dylib" ".so" ".a")
 set(CMAKE_SHARED_LIBRARY_SONAME_C_FLAG "-install_name")
 
-# Set the find root to the iOS developer roots and to user defined paths.
-set(CMAKE_FIND_ROOT_PATH ${CMAKE_OSX_SYSROOT_INT} ${CMAKE_PREFIX_PATH} CACHE INTERNAL "")
 set(CMAKE_IGNORE_PATH "/System/Library/Frameworks;/usr/local/lib" CACHE INTERNAL "")
+
 # Default to searching for frameworks first.
 set(CMAKE_FIND_FRAMEWORK FIRST)
+
 # Set up the default search directories for frameworks.
 if(PLATFORM_INT MATCHES "MAC_CATALYST.*")
   set(CMAKE_FRAMEWORK_PATH
