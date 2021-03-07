@@ -452,6 +452,7 @@ elseif(NOT DEFINED ENABLE_BITCODE)
 endif()
 set(ENABLE_BITCODE_INT ${ENABLE_BITCODE} CACHE BOOL
         "Whether or not to enable bitcode" FORCE)
+
 # Use ARC or not
 if(NOT DEFINED ENABLE_ARC)
   # Unless specified, enable ARC support by default
@@ -459,6 +460,7 @@ if(NOT DEFINED ENABLE_ARC)
   message(STATUS "[DEFAULTS] Enabling ARC support by default. ENABLE_ARC not provided!")
 endif()
 set(ENABLE_ARC_INT ${ENABLE_ARC} CACHE BOOL "Whether or not to enable ARC" FORCE)
+
 # Use hidden visibility or not
 if(NOT DEFINED ENABLE_VISIBILITY)
   # Unless specified, disable symbols visibility by default
@@ -466,6 +468,7 @@ if(NOT DEFINED ENABLE_VISIBILITY)
   message(STATUS "[DEFAULTS] Hiding symbols visibility by default. ENABLE_VISIBILITY not provided!")
 endif()
 set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL "Whether or not to hide symbols (-fvisibility=hidden)" FORCE)
+
 # Set strict compiler checks or not
 if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
   # Unless specified, disable strict try_compile()
@@ -523,6 +526,7 @@ elseif(NOT DEFINED CMAKE_CXX_COMPILER)
           ERROR_QUIET
           OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
+
 # Find (Apple's) libtool.
 if(DEFINED BUILD_LIBTOOL)
   # Environment variables are always preserved.
@@ -535,6 +539,7 @@ elseif(NOT DEFINED BUILD_LIBTOOL)
           ERROR_QUIET
           OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
+
 # Find the toolchain's provided install_name_tool if none is found on the host
 if(DEFINED CMAKE_INSTALL_NAME_TOOL)
   # Environment variables are always preserved.
@@ -581,6 +586,7 @@ elseif(NOT DEFINED CMAKE_SYSTEM_NAME)
   # Legacy code path prior to CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
   set(CMAKE_SYSTEM_NAME Darwin)
 endif()
+
 # Standard settings.
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
 set(UNIX TRUE CACHE BOOL "")
@@ -597,12 +603,15 @@ endif()
 set(CMAKE_AR ar CACHE FILEPATH "" FORCE)
 set(CMAKE_RANLIB ranlib CACHE FILEPATH "" FORCE)
 set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
+
 # Set the architectures for which to build.
 set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE INTERNAL "")
+
 # Change the type of target generated for try_compile() so it'll work when cross-compiling, weak compiler checks
 if(NOT ENABLE_STRICT_TRY_COMPILE_INT)
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 endif()
+
 # All iOS/Darwin specific settings - some may be redundant.
 set(CMAKE_MACOSX_BUNDLE YES)
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
@@ -809,11 +818,11 @@ set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".tbd" ".dylib" ".so" ".a")
 set(CMAKE_SHARED_LIBRARY_SONAME_C_FLAG "-install_name")
 
-# Set the find root to the iOS developer roots and to user defined paths.
-set(CMAKE_FIND_ROOT_PATH ${CMAKE_OSX_SYSROOT_INT} ${CMAKE_PREFIX_PATH} CACHE INTERNAL "")
 set(CMAKE_IGNORE_PATH "/System/Library/Frameworks;/usr/local/lib" CACHE INTERNAL "")
+
 # Default to searching for frameworks first.
 set(CMAKE_FIND_FRAMEWORK FIRST)
+
 # Set up the default search directories for frameworks.
 if(PLATFORM_INT MATCHES "MAC_CATALYST.*")
   set(CMAKE_FRAMEWORK_PATH
@@ -826,20 +835,6 @@ else()
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
           ${CMAKE_FRAMEWORK_PATH} CACHE INTERNAL "")
-endif()
-
-# By default, search both the specified iOS SDK and the remainder of the host filesystem.
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE INTERNAL "")
-endif()
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_LIBRARY)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE INTERNAL "")
-endif()
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_INCLUDE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE INTERNAL "")
-endif()
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_PACKAGE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE INTERNAL "")
 endif()
 
 #
@@ -858,16 +853,17 @@ endmacro(set_xcode_property)
 
 # This macro lets you find executable programs on the host system.
 macro(find_host_package)
+  set(_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ${CMAKE_FIND_ROOT_PATH_MODE_PROGRAM})
+  set(_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ${CMAKE_FIND_ROOT_PATH_MODE_LIBRARY})
+  set(_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ${CMAKE_FIND_ROOT_PATH_MODE_INCLUDE})
+  set(_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ${CMAKE_FIND_ROOT_PATH_MODE_PACKAGE})
   set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
   set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
   set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
   set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
-  set(IOS FALSE)
-  set(_TOOLCHAIN_IOS ${IOS})
   find_package(${ARGN})
-  set(IOS ${_TOOLCHAIN_IOS})
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ${_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_PROGRAM})
+  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ${_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_LIBRARY})
+  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ${_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_INCLUDE})
+  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ${_TOOLCHAIN_CMAKE_FIND_ROOT_PATH_MODE_PACKAGE})
 endmacro(find_host_package)
