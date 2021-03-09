@@ -109,9 +109,10 @@
 #
 # This toolchain defines the following properties (available via get_property()) for use externally:
 #
+# PLATFORM: The currently targeted platform.
 # XCODE_VERSION: Version number (not including Build version) of Xcode detected.
 # SDK_VERSION: Version of SDK being used.
-# CMAKE_OSX_ARCHITECTURES: Architectures being compiled for (generated from PLATFORM).
+# OSX_ARCHITECTURES: Architectures being compiled for (generated from PLATFORM).
 # APPLE_TARGET_TRIPLE: Used by autoconf build systems. NOTE: If "ARCHS" are overridden, this will *NOT* be set!
 #
 # This toolchain defines the following macros for use externally:
@@ -820,6 +821,7 @@ set_property(GLOBAL PROPERTY PLATFORM "${PLATFORM}")
 set_property(GLOBAL PROPERTY APPLE_TARGET_TRIPLE "${APPLE_TARGET_TRIPLE_INT}")
 set_property(GLOBAL PROPERTY SDK_VERSION "${SDK_VERSION}")
 set_property(GLOBAL PROPERTY XCODE_VERSION "${XCODE_VERSION_INT}")
+set_property(GLOBAL PROPERTY OSX_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
 
 # Export configurable variables for the try_compile() command.
 set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES

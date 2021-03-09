@@ -73,7 +73,7 @@ cmake --install . --config Release
 
 `CMAKE_OSX_ARCHITECTURES` - Architectures being compiled for (generated from PLATFORM).
 
-`APPLE_TARGET_TRIPLE` - Used by autoconf build systems. NOTE: If "`ARCHS` are overridden, this will **NOT** be set! 
+`APPLE_TARGET_TRIPLE` - Used by autoconf build systems. 
 
 ### Additional Options
 `-DENABLE_BITCODE=(BOOL)` - Enabled by default, specify FALSE or 0 to disable bitcode
