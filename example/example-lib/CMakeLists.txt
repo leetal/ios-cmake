@@ -13,6 +13,13 @@ else()
   message(STATUS "kqueue found!")
 endif()
 
+find_library(MAPKIT_LIBRARY MapKit)
+if (NOT MAPKIT_LIBRARY)
+  message(STATUS "MapKit.framework NOT found!")
+else()
+  message(STATUS "MapKit.framework found! ${MAPKIT_LIBRARY}")
+endif()
+
 find_library(APPKIT_LIBRARY AppKit)
 if (NOT APPKIT_LIBRARY)
   message(STATUS "AppKit.framework NOT found!")

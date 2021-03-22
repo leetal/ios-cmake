@@ -870,9 +870,9 @@ set(CMAKE_FIND_FRAMEWORK FIRST)
 # Set up the default search directories for frameworks.
 if(PLATFORM_INT MATCHES "MAC_CATALYST.*")
   set(CMAKE_FRAMEWORK_PATH
+          ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/System/Library/Frameworks
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
-          ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/System/Library/Frameworks
           ${CMAKE_FRAMEWORK_PATH} CACHE INTERNAL "")
 else()
   set(CMAKE_FRAMEWORK_PATH
