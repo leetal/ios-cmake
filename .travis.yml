@@ -78,7 +78,7 @@ jobs:
       stage: "macOS builds"
       osx_image: xcode12.2
       env:
-        - PLATFORM=MAC DEPLOYMENT_TARGET=10.13 -DBUILD_SHARED=1
+        - PLATFORM=MAC DEPLOYMENT_TARGET=10.13 BUILD_SHARED=1
     - name: "Xcode version 12.2, Target macOS on Apple Silicon [arm64] SDK 11.0 [allowed failure]"
       stage: "macOS builds"
       osx_image: xcode12.2
@@ -101,12 +101,24 @@ jobs:
       osx_image: xcode12.2
       env:
         - PLATFORM=MAC_CATALYST_ARM64 DEPLOYMENT_TARGET=13.0
+      install:
+        - rm -rf $(which cmake)
+        - brew uninstall cmake
+        - wget https://github.com/Kitware/CMake/releases/download/v3.19.7/cmake-3.19.7-macos-universal.tar.gz -O cmake-3.19.7.tar.gz
+        - tar -xf ./cmake-3.19.7.tar.gz -C /tmp
+        - export PATH="/tmp/cmake-3.19.7-macos-universal/CMake.app/Contents/bin:${PATH}"
 
     - name: "Use new *COMBINED build support in CMake 3.19.4+ [allowed failure]"
       stage: "New build system combined builds"
       osx_image: xcode12.2
       env:
         - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
+      install:
+        - rm -rf $(which cmake)
+        - brew uninstall cmake
+        - wget https://github.com/Kitware/CMake/releases/download/v3.19.7/cmake-3.19.7-macos-universal.tar.gz -O cmake-3.19.7.tar.gz
+        - tar -xf ./cmake-3.19.7.tar.gz -C /tmp
+        - export PATH="/tmp/cmake-3.19.7-macos-universal/CMake.app/Contents/bin:${PATH}"
 
     - name: "libCURL example combined build on iOS"
       stage: "libCURL example builds"

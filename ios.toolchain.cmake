@@ -280,7 +280,7 @@ elseif(PLATFORM_INT STREQUAL "OS64")
   set(SDK_NAME iphoneos)
   if(NOT ARCHS)
     if (XCODE_VERSION_INT VERSION_GREATER 10.0)
-      set(ARCHS arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
+      set(ARCHS arm64) # Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
     else()
       set(ARCHS arm64)
     endif()
@@ -489,7 +489,7 @@ elseif(DEFINED CMAKE_OSX_SYSROOT_INT)
 endif()
 
 # Use bitcode or not
-if(NOT DEFINED ENABLE_BITCODE AND NOT ARCHS MATCHES "((^|;|, )(i386|x86_64))+")
+if(NOT DEFINED ENABLE_BITCODE AND NOT PLATFORM_INT MATCHES "SIMULATOR")
   # Unless specified, enable bitcode support by default
   message(STATUS "[DEFAULTS] Enabling bitcode support by default. ENABLE_BITCODE not provided!")
   set(ENABLE_BITCODE TRUE)
