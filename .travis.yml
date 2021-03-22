@@ -84,6 +84,12 @@ jobs:
       osx_image: xcode12.2
       env:
         - PLATFORM=MAC_ARM64 DEPLOYMENT_TARGET=11.0
+      install:
+        - rm -rf $(which cmake)
+        - brew uninstall cmake 
+        - wget https://github.com/Kitware/CMake/releases/download/v3.19.7/cmake-3.19.7-macos-universal.tar.gz -O cmake-3.19.7.tar.gz
+        - tar -xf ./cmake-3.19.7.tar.gz -C /tmp
+        - export PATH="/tmp/cmake-3.19.7-macos-universal/CMake.app/Contents/bin:${PATH}"
 
     - name: "Mac Catalyst, iOS target 13.0 [x86_64]"
       stage: "Mac Catalyst builds"
