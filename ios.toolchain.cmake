@@ -1,6 +1,7 @@
 # This file is part of the ios-cmake project. It was retrieved from
-# https://github.com/gerstrong/ios-cmake.git which is a fork of
-# https://github.com/cristeab/ios-cmake.git, which again is a fork of
+# https://github.com/leetal/ios-cmake.git, which is a fork of
+# https://github.com/gerstrong/ios-cmake.git, which is a fork of
+# https://github.com/cristeab/ios-cmake.git, which is a fork of
 # https://code.google.com/p/ios-cmake/. Which in turn is based off of
 # the Platform/Darwin.cmake and Platform/UnixPaths.cmake files which
 # are included with CMake 2.8.4
