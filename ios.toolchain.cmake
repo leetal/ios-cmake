@@ -247,7 +247,7 @@ if(NOT DEFINED DEPLOYMENT_TARGET)
     set(DEPLOYMENT_TARGET "11.0")
   endif()
   message(STATUS "[DEFAULTS] Using the default min-version since DEPLOYMENT_TARGET not provided!")
-elseif(DEFINED DEPLOYMENT_TARGET AND PLATFORM STREQUAL "MAC_CATALYST" AND ${DEPLOYMENT_TARGET} VERSION_LESS "13.0")
+elseif(DEFINED DEPLOYMENT_TARGET AND PLATFORM MATCHES "^MAC_CATALYST" AND ${DEPLOYMENT_TARGET} VERSION_LESS "13.0")
   message(FATAL_ERROR "Mac Catalyst builds requires a minimum deployment target of 13.0!")
 endif()
 
@@ -717,7 +717,7 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11")
     set(SDK_NAME_VERSION_FLAGS
             "-mios-simulator-version-min=${DEPLOYMENT_TARGET}")
   endif()
-elseif(NOT PLATFORM_INT STREQUAL "MAC_CATALYST")
+elseif(NOT PLATFORM_INT MATCHES "^MAC_CATALYST")
   # Newer versions of CMake sets the version min flags correctly, skip this for Mac Catalyst targets
   set(CMAKE_OSX_DEPLOYMENT_TARGET ${DEPLOYMENT_TARGET})
 endif()
@@ -726,7 +726,7 @@ if(DEFINED APPLE_TARGET_TRIPLE_INT)
   set(APPLE_TARGET_TRIPLE ${APPLE_TARGET_TRIPLE_INT} CACHE INTERNAL "")
 endif()
 
-if(PLATFORM_INT STREQUAL "MAC_CATALYST")
+if(PLATFORM_INT MATCHES "^MAC_CATALYST")
   set(C_TARGET_FLAGS "-target ${APPLE_TARGET_TRIPLE_INT} -isystem ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/usr/include")
 endif()
 
@@ -870,7 +870,7 @@ endif()
 set(CMAKE_FIND_FRAMEWORK FIRST)
 
 # Set up the default search directories for frameworks.
-if(PLATFORM_INT MATCHES "MAC_CATALYST.*")
+if(PLATFORM_INT MATCHES "^MAC_CATALYST") 
   set(CMAKE_FRAMEWORK_PATH
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
