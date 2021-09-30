@@ -93,18 +93,18 @@ jobs:
 
     - name: "Mac Catalyst, iOS target 13.0 [x86_64]"
       stage: "Mac Catalyst builds"
-      osx_image: xcode12.2
+      osx_image: xcode12u
       env:
         - PLATFORM=MAC_CATALYST DEPLOYMENT_TARGET=13.0
     - name: "Mac Catalyst on Apple Silicon, Target iOS 13.0 [arm64] [allowed failure]"
       stage: "Mac Catalyst builds"
-      osx_image: xcode12.2
+      osx_image: xcode12u
       env:
         - PLATFORM=MAC_CATALYST_ARM64 DEPLOYMENT_TARGET=13.0
 
     - name: "Use new *COMBINED build support in CMake 3.19.4+ [allowed failure]"
       stage: "New build system combined builds"
-      osx_image: xcode12.2
+      osx_image: xcode12.5
       env:
         - PLATFORM=OS64COMBINED USE_XCODE=1 DEPLOYMENT_TARGET=11.0 USE_NEW_BUILD=1
 
