@@ -8,7 +8,7 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 ios-cmake
 =========
 
-[![Build Status](https://travis-ci.org/leetal/ios-cmake.svg?branch=master)](https://travis-ci.org/leetal/ios-cmake)
+[![Build Status](https://app.travis-ci.com/leetal/ios-cmake.svg?branch=master)](https://app.travis-ci.com/leetal/ios-cmake)
 
 Tested with the following combinations:
 * XCode 8.3, iOS SDK 10.3
