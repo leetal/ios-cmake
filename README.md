@@ -37,8 +37,8 @@ Tested with the following combinations:
 * _MAC_CATALYST_ - to build iOS for Mac (Catalyst, x86_64)
 * _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64)
 
-# Example usage 
-**_NOTE_: Change the `-DPLATFORM` to an applicable value if targeting another platform.**
+# Sample usage 
+**_NOTE_: Change the `-DPLATFORM` to an applicable value if targeting some other platform.**
 
 ```bash
 cd example/example-lib
@@ -87,7 +87,7 @@ cmake --install . --config Release
 `-DARCHS=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DPLATFORM` (see above)
 
 __*To combine all platforms into the same FAT-library, either build any of the "*COMBINED*" platform types OR use the 
-LIPO tool. More information on how to combine libraries with LIPO is readily available on the net.*__
+LIPO tool. More information on how to combine libraries with LIPO is easily available on the internet.*__
 
 ## Thanks To
 
