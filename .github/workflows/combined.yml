@@ -13,7 +13,7 @@ jobs:
     env:
       PLATFORM: OS64COMBINED
       USE_NEW_BUILD: 1
-      DEPLOYMENT_TARGET: 12.0
+      DEPLOYMENT_TARGET: "12.0"
       USE_XCODE: 1
     steps:
     - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
     env:
       PLATFORM: WATCHOSCOMBINED
       USE_NEW_BUILD: 1
-      DEPLOYMENT_TARGET: 5.0
+      DEPLOYMENT_TARGET: "5.0"
       USE_XCODE: 1
     steps:
     - uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
     env:
       PLATFORM: TVOSCOMBINED
       USE_NEW_BUILD: 1
-      DEPLOYMENT_TARGET: 11.0
+      DEPLOYMENT_TARGET: "11.0"
       USE_XCODE: 1
     steps:
     - uses: actions/checkout@v2
@@ -53,17 +53,17 @@ jobs:
     - name: Build
       run: ./.github/build.sh
   build_with_13_1_OS64_LIBCURL:
-    name: "Xcode version 13.2, Target iOS [arm64, x86_64] Target SDK 14.0 [libCURL example]"
+    name: "Xcode version 13.1, Target iOS [arm64, x86_64] Target SDK 14.0 [libCURL example]"
     runs-on: macos-11
     env:
       PLATFORM: OS64COMBINED
-      DEPLOYMENT_TARGET: 14.0
+      DEPLOYMENT_TARGET: "14.0"
       USE_XCODE: 1
       BUILD_CURL: 1
     steps:
     - uses: actions/checkout@v2
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '13.2'
+        xcode-version: '13.1'
     - name: Build
       run: ./.github/build.sh

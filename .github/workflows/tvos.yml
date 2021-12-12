@@ -12,7 +12,7 @@ jobs:
     runs-on: macos-latest
     env:
       PLATFORM: TVOS
-      DEPLOYMENT_TARGET: 11.0
+      DEPLOYMENT_TARGET: "11.0"
     steps:
     - uses: actions/checkout@v2
     - uses: maxim-lobanov/setup-xcode@v1
