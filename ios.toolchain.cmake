@@ -731,7 +731,7 @@ if(DEFINED APPLE_TARGET_TRIPLE_INT)
 endif()
 
 if(PLATFORM_INT MATCHES "^MAC_CATALYST")
-  set(C_TARGET_FLAGS "-target ${APPLE_TARGET_TRIPLE_INT} -isystem ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/usr/include")
+  set(C_TARGET_FLAGS "-target ${APPLE_TARGET_TRIPLE_INT} -isystem ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/usr/include -iframework ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/System/Library/Frameworks")
 endif()
 
 if(ENABLE_BITCODE_INT)
