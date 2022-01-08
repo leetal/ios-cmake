@@ -22,13 +22,17 @@ if [[ ${USE_XCODE} -eq 1 ]]; then
     GENERATOR_EXT="-G Xcode"
 fi
 
+cmake --version
+
 if [[ ${BUILD_CURL} -eq 1 ]]; then
   mkdir -p example/example-curl/build
   pushd example/example-curl/build || exit 1
   cmake .. \
-    ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DCMAKE_INSTALL_PREFIX=../out \
+    ${GENERATOR_EXT} -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake \
     -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} || exit 1
-  cmake --build . --config Release --parallel 4 || exit 1
+    
+  cmake --build . --config Release || exit 1
+  cmake --install . --config Release || exit 1
   popd || exit 1
 else
   mkdir -p example/example-lib/build
@@ -38,7 +42,7 @@ else
     -DPLATFORM=${PLATFORM} -DDEPLOYMENT_TARGET=${DEPLOYMENT_TARGET} -DENABLE_STRICT_TRY_COMPILE=${USE_STRICT_COMPILER_CHECKS} ${SHARED_EXT}\
    || exit 1
 
-  # Test new way of building in newer CMake versions when building the *COMBINED platform options
+  # Test new way of building in newer CMake versions when building the *COMBINED platform options due to the new Xcode buildsystem breaking parallell builds
   if [[ ${USE_NEW_BUILD} -eq 1 ]]; then
     cmake --build . --config Release || exit 1
     cmake --install . --config Release || exit 1

@@ -1,0 +1,74 @@
+name: ios-jobs
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [ opened, synchronize ]
+
+jobs:
+  build_with_11_7_0_OS:
+    name: "Xcode version 11.7.0, Target iOS [arm64] Target SDK 9.0"
+    runs-on: macos-latest
+    env:
+      PLATFORM: OS64
+      DEPLOYMENT_TARGET: 9.0
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '11.7.0'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_11_7_0_SIMULATOR64:
+    name: "Xcode version 11.7.0, Target iOS Simulator [x86_64] Target SDK 11.0"
+    runs-on: macos-latest
+    env:
+      PLATFORM: SIMULATOR64
+      DEPLOYMENT_TARGET: 11.0
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '11.7.0'
+    - name: Build
+      run: ./.github/build.sh    
+  build_with_11_7_0_SIMULATORARM64:
+    name: "Xcode version 12.5.1, Target iOS Simulator [arm64] Target SDK 11.0"
+    runs-on: macos-latest
+    env:
+      PLATFORM: SIMULATORARM64
+      DEPLOYMENT_TARGET: 11.0
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '12.5.1'
+    - name: Build
+      run: ./.github/build.sh    
+  build_with_11_7_0_OS64:
+    name: "Xcode version 11.7.0, Target iOS [arm64] Target SDK 11.0"
+    runs-on: macos-latest
+    env:
+      PLATFORM: OS64
+      DEPLOYMENT_TARGET: "11.0"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '11.7.0'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_12_5_1_OS64:
+    name: "Xcode version 12.5.1, Target iOS [arm64] Target SDK 12.0"
+    runs-on: macos-latest
+    env:
+      PLATFORM: OS64
+      DEPLOYMENT_TARGET: "12.0"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '12.5.1'
+    - name: Build
+      run: ./.github/build.sh

@@ -1,0 +1,36 @@
+name: macos-jobs
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [ opened, synchronize ]
+
+jobs:
+  build_with_12_5_1_MAC:
+    name: "Xcode version 12.5.1, Target macOS [x86_64] Target SDK 10.13"
+    runs-on: macos-latest
+    env:
+      PLATFORM: MAC
+      DEPLOYMENT_TARGET: "10.13"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '12.5.1'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_13_2_MAC:
+    name: "Xcode version 13.2, Target macOS [arm64] Target SDK 11.0 [shared example]"
+    runs-on: macos-11
+    env:
+      PLATFORM: MAC_ARM64
+      DEPLOYMENT_TARGET: "11.0"
+      BUILD_SHARED: 1
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.2'
+    - name: Build
+      run: ./.github/build.sh

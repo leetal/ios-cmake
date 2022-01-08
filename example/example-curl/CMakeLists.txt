@@ -1,9 +1,11 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.21)
+
+cmake_policy(SET CMP0114 NEW)
   
 project(external-curl)
 include(ExternalProject)
 
-set(CURL_VERSION 7.65.3)
+set(CURL_VERSION 7.80.0)
 string(REPLACE "." "_" CURL_VERSION_USCORE ${CURL_VERSION})
 
 list(APPEND CMAKE_ARGS
@@ -26,6 +28,7 @@ list(APPEND CMAKE_ARGS
     "-DCURL_DISABLE_IMAP=ON"
     "-DCURL_DISABLE_SMTP=ON"
     "-DCURL_DISABLE_GOPHER=ON"
+    "-DUSE_MANUAL=OFF"
 )
 
 if(IOS)
@@ -44,4 +47,5 @@ ExternalProject_add(
     URL https://github.com/curl/curl/releases/download/curl-${CURL_VERSION_USCORE}/curl-${CURL_VERSION}.tar.gz
     PREFIX curl
     CMAKE_ARGS "${CMAKE_ARGS}"
+    INSTALL_COMMAND cmake -E echo "Skipping install step."
     )

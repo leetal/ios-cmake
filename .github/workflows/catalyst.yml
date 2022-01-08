@@ -1,0 +1,35 @@
+name: catalyst-jobs
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [ opened, synchronize ]
+
+jobs:
+  build_with_13_1_MAC_CATALYST:
+    name: "Xcode version 13.1, Target macOS Catalyst on Apple Silicon [arm64] Target SDK 13.0"
+    runs-on: macos-11
+    env:
+      PLATFORM: MAC_CATALYST
+      DEPLOYMENT_TARGET: "13.0"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.1'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_13_1_MAC_CATALYST_ARM64:
+    name: "Xcode version 13.2, Target macOS Catalyst on Intel CPUs [x86_64] Target SDK 13.0"
+    runs-on: macos-11
+    env:
+      PLATFORM: MAC_CATALYST_ARM64
+      DEPLOYMENT_TARGET: "13.0"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.2'
+    - name: Build
+      run: ./.github/build.sh

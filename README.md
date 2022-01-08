@@ -4,19 +4,28 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 * Experimental Catalyst support (iOS on macOS)
 * macOS support and experimental Apple Silicon support
 * Deprecated options now removed.
+* Builds now run on Github Actions
 
 ios-cmake
 =========
 
-[![Build Status](https://travis-ci.org/leetal/ios-cmake.svg?branch=master)](https://travis-ci.org/leetal/ios-cmake)
+[![catalyst-jobs](https://github.com/leetal/ios-cmake/actions/workflows/catalyst.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/catalyst.yml) &nbsp; [![combined-jobs](https://github.com/leetal/ios-cmake/actions/workflows/combined.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/combined.yml) &nbsp; [![ios-jobs](https://github.com/leetal/ios-cmake/actions/workflows/ios.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/ios.yml)
+
+[![macos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/macos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/macos.yml) &nbsp; [![tvos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/tvos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/tvos.yml) &nbsp; [![watchos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/watchos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/watchos.yml)
 
 Tested with the following combinations:
-* XCode 8.3, iOS SDK 10.3
-* XCode 9.4, iOS SDK 11.4
-* XCode 10.2, iOS SDK 12.2
-* XCode 11.1, iOS SDK 13.1
-* XCode 11.3, iOS SDK 13.3
-* XCode 12.4, iOS/iPadOS SDK 14.4, tvOS 14.3, watchOS 7.2, macOS SDK 11.1
+* XCode 11.7
+  - iOS SDK 9.0 & 11.0
+  - watchOS SDK 5.0
+  - tvOS SDK 11.0
+* XCode 12.5.1
+  - iOS SDK 12.0
+  - watchOS SDK 7.0
+  - macOS SDK 10.13
+  - iOS, watchOS, tvOS combined builds, mixed SDKs
+* XCode 13.2
+  - Mac Catalyst SDK 13.0
+  - macOS SDK 11.0
 
 ## Platform flag options (-DPLATFORM=_flag_)
 

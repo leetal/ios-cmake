@@ -1,0 +1,69 @@
+name: combined-jobs
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    types: [ opened, synchronize ]
+
+jobs:  
+  build_with_12_5_1_OS64COMBINED:
+    name: "Xcode version 13.1, Target iOS Combined [x86_64, arm64] Target SDK 12.0"
+    runs-on: macos-11
+    env:
+      PLATFORM: OS64COMBINED
+      USE_NEW_BUILD: 1
+      DEPLOYMENT_TARGET: "12.0"
+      USE_XCODE: 1
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.1'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_12_5_1_WATCHOSCOMBINED:
+    name: "Xcode version 13.1, Target watchOS Combined [armv7k, arm64_32, x86_64] Target SDK 5.0"
+    runs-on: macos-11
+    env:
+      PLATFORM: WATCHOSCOMBINED
+      USE_NEW_BUILD: 1
+      DEPLOYMENT_TARGET: "5.0"
+      USE_XCODE: 1
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.1'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_12_5_1_TVOSCOMBINED:
+    name: "Xcode version 13.1, Target tvOS Combined [arm64, x86_64] Target SDK 11.0"
+    runs-on: macos-11
+    env:
+      PLATFORM: TVOSCOMBINED
+      USE_NEW_BUILD: 1
+      DEPLOYMENT_TARGET: "11.0"
+      USE_XCODE: 1
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.1'
+    - name: Build
+      run: ./.github/build.sh
+  build_with_13_1_OS64_LIBCURL:
+    name: "Xcode version 13.1, Target iOS [arm64, x86_64] Target SDK 14.0 [libCURL example]"
+    runs-on: macos-11
+    env:
+      PLATFORM: OS64COMBINED
+      DEPLOYMENT_TARGET: "14.0"
+      USE_XCODE: 1
+      BUILD_CURL: 1
+    steps:
+    - uses: actions/checkout@v2
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '13.1'
+    - name: Build
+      run: ./.github/build.sh
