@@ -24,6 +24,13 @@ else()
   message(STATUS "AppKit.framework found! ${APPKIT_LIBRARY}")
 endif()
 
+find_library(FOUNDATION_LIBRARY Foundation)
+if (NOT FOUNDATION_LIBRARY)
+  message(STATUS "Foundation.framework NOT found!")
+else()
+  message(STATUS "Foundation.framework found! ${FOUNDATION_LIBRARY}")
+endif()
+
 find_library(UIKIT_LIBRARY UIKit)
 if (NOT UIKIT_LIBRARY)
   message(STATUS "UIKit.framework NOT found!")
@@ -61,10 +68,12 @@ set(HEADERS
 # Library
 if(BUILD_SHARED)
   add_library (example SHARED ${SOURCES} ${HEADERS})
+  target_link_libraries(example ${FOUNDATION_LIBRARY})
   target_compile_definitions(example PUBLIC IS_BUILDING_SHARED)
   message(STATUS "Building shared version...")
 else()
   add_library (example STATIC ${SOURCES} ${HEADERS})
+  target_link_libraries(example ${FOUNDATION_LIBRARY})
   message(STATUS "Building static version...")
 endif()
 
