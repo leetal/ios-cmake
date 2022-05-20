@@ -20,7 +20,7 @@ jobs:
         xcode-version: '13.1'
     - name: Build
       run: ./.github/build.sh
-  build_with_13_1_MAC_CATALYST_ARM64:
+  build_with_13_4_MAC_CATALYST_ARM64:
     name: "Xcode version 13.4, Target macOS Catalyst on Apple Silicon [arm64] Target SDK 13.1"
     runs-on: macos-12
     env:
