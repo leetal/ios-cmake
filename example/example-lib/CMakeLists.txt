@@ -1,8 +1,12 @@
 cmake_minimum_required (VERSION 3.2)
-project (example-ios C CXX)
+project (example-ios)
 enable_testing()
 
+enable_language(CXX)
+enable_language(OBJC)
+
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
+MESSAGE( STATUS "CMAKE_OBJC_FLAGS: " ${CMAKE_OBJC_FLAGS} )
 
 # Add some sanitary checks that the toolchain is actually working!
 include(CheckCXXSymbolExists)
@@ -18,6 +22,13 @@ if (NOT APPKIT_LIBRARY)
   message(STATUS "AppKit.framework NOT found!")
 else()
   message(STATUS "AppKit.framework found! ${APPKIT_LIBRARY}")
+endif()
+
+find_library(FOUNDATION_LIBRARY Foundation)
+if (NOT FOUNDATION_LIBRARY)
+  message(STATUS "Foundation.framework NOT found!")
+else()
+  message(STATUS "Foundation.framework found! ${FOUNDATION_LIBRARY}")
 endif()
 
 find_library(UIKIT_LIBRARY UIKit)
@@ -57,10 +68,12 @@ set(HEADERS
 # Library
 if(BUILD_SHARED)
   add_library (example SHARED ${SOURCES} ${HEADERS})
+  target_link_libraries(example ${FOUNDATION_LIBRARY})
   target_compile_definitions(example PUBLIC IS_BUILDING_SHARED)
   message(STATUS "Building shared version...")
 else()
   add_library (example STATIC ${SOURCES} ${HEADERS})
+  target_link_libraries(example ${FOUNDATION_LIBRARY})
   message(STATUS "Building static version...")
 endif()
 
