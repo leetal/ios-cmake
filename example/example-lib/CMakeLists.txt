@@ -1,8 +1,12 @@
 cmake_minimum_required (VERSION 3.2)
-project (example-ios C CXX)
+project (example-ios)
 enable_testing()
 
+enable_language(CXX)
+enable_language(OBJC)
+
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
+MESSAGE( STATUS "CMAKE_OBJC_FLAGS: " ${CMAKE_OBJC_FLAGS} )
 
 # Add some sanitary checks that the toolchain is actually working!
 include(CheckCXXSymbolExists)
