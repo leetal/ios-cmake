@@ -57,7 +57,7 @@ cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS
 cmake --build . --config Release
 ```
 
-This will build and install the library for the given PLATFORM. In this case, iOS with the arm64 architecture.
+This will build the library for the given PLATFORM. In this case, iOS with the arm64 architecture.
 
 ### COMBINED Options
 The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) will build complete FAT-libraries for 
@@ -68,7 +68,7 @@ Example:
 ```bash
 cmake . -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS64COMBINED
 cmake --build . --config Release
-cmake --install . --config Release
+cmake --install . --config Release # Necessary to build combined library
 ```
 
 **_NOTE_: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode) on CMake versions 3.14+!**
