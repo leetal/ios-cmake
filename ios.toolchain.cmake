@@ -58,15 +58,15 @@
 # PLATFORM: (default "OS64")
 #    OS = Build for iPhoneOS.
 #    OS64 = Build for arm64 iphoneOS.
-#    OS64COMBINED = Build for arm64 x86_64 iphoneOS. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
+#    OS64COMBINED = Build for arm64 x86_64 iphoneOS + iphoneOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR = Build for x86 i386 iphoneOS Simulator.
 #    SIMULATOR64 = Build for x86_64 iphoneOS Simulator.
 #    SIMULATORARM64 = Build for arm64 iphoneOS Simulator.
 #    TVOS = Build for arm64 tvOS.
-#    TVOSCOMBINED = Build for arm64 x86_64 tvOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
+#    TVOSCOMBINED = Build for arm64 x86_64 tvOS + tvOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_TVOS = Build for x86_64 tvOS Simulator.
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
-#    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
+#    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS + watchOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
 #    MAC = Build for x86_64 macOS.
 #    MAC_ARM64 = Build for Apple Silicon macOS.
