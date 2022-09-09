@@ -542,7 +542,7 @@ set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL "Whether or not to hid
 if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
   # Unless specified, disable strict try_compile()
   set(ENABLE_STRICT_TRY_COMPILE ON)
-  message(STATUS "[DEFAULTS] Using strict compiler checks by default to fix dynamic link issue. ENABLE_STRICT_TRY_COMPILE not provided!")
+  message(STATUS "[DEFAULTS] Using strict compiler checks by default to avoid dynamic link issue. ENABLE_STRICT_TRY_COMPILE not provided!")
 endif()
 set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL
         "Whether or not to use strict compiler checks" FORCE)
