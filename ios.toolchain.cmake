@@ -97,7 +97,7 @@
 # ENABLE_VISIBILITY: (ON|OFF) Enables or disables symbol visibility support. Default OFF (visibility hidden by default)
 #
 # ENABLE_STRICT_TRY_COMPILE: (ON|OFF) Enables or disables strict try_compile() on all Check* directives (will run linker
-#    to actually check if linking is possible). Default OFF (will set CMAKE_TRY_COMPILE_TARGET_TYPE to STATIC_LIBRARY)
+#    to actually check if linking is possible). Default ON (will set CMAKE_TRY_COMPILE_TARGET_TYPE to STATIC_LIBRARY)
 #
 # ARCHS: (armv7 armv7s armv7k arm64 arm64_32 i386 x86_64) If specified, will override the default architectures for the given PLATFORM
 #    OS = armv7 armv7s arm64 (if applicable)
@@ -541,8 +541,8 @@ set(ENABLE_VISIBILITY_INT ${ENABLE_VISIBILITY} CACHE BOOL "Whether or not to hid
 # Set strict compiler checks or not
 if(NOT DEFINED ENABLE_STRICT_TRY_COMPILE)
   # Unless specified, disable strict try_compile()
-  set(ENABLE_STRICT_TRY_COMPILE OFF)
-  message(STATUS "[DEFAULTS] Using NON-strict compiler checks by default. ENABLE_STRICT_TRY_COMPILE not provided!")
+  set(ENABLE_STRICT_TRY_COMPILE ON)
+  message(STATUS "[DEFAULTS] Using strict compiler checks by default to fix dynamic link issue. ENABLE_STRICT_TRY_COMPILE not provided!")
 endif()
 set(ENABLE_STRICT_TRY_COMPILE_INT ${ENABLE_STRICT_TRY_COMPILE} CACHE BOOL
         "Whether or not to use strict compiler checks" FORCE)
