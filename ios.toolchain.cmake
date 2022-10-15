@@ -37,7 +37,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# This file is based off of the Platform/Darwin.cmake and
+# This file is based on the Platform/Darwin.cmake and
 # Platform/UnixPaths.cmake files which are included with CMake 2.8.4
 # It has been altered for iOS development.
 #
@@ -80,7 +80,7 @@
 #    can also be manually specified (although this should not be required).
 #
 # CMAKE_DEVELOPER_ROOT: Path to the Developer directory for the platform
-#    being compiled for.  By default this is automatically determined from
+#    being compiled for.  By default, this is automatically determined from
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
 #
@@ -88,7 +88,7 @@
 #
 # NAMED_LANGUAGE_SUPPORT:
 #    ON (default) = Will require "enable_language(OBJC) and/or enable_language(OBJCXX)" for full OBJC|OBJCXX support
-#    OFF = Will embed the OBJC and OBJCXX flags into the CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (legacy behaviour, CMake version < 3.16)
+#    OFF = Will embed the OBJC and OBJCXX flags into the CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (legacy behavior, CMake version < 3.16)
 #
 # ENABLE_BITCODE: (ON|OFF) Enables or disables bitcode support. Default ON
 #
@@ -126,7 +126,7 @@
 # XCODE_VERSION: Version number (not including Build version) of Xcode detected.
 # SDK_VERSION: Version of SDK being used.
 # OSX_ARCHITECTURES: Architectures being compiled for (generated from PLATFORM).
-# APPLE_TARGET_TRIPLE: Used by autoconf build systems. NOTE: If "ARCHS" are overridden, this will *NOT* be set!
+# APPLE_TARGET_TRIPLE: Used by autoconf build systems. NOTE: If "ARCHS" is overridden, this will *NOT* be set!
 #
 # This toolchain defines the following macros for use externally:
 #
@@ -167,9 +167,9 @@ endif()
 
 # Get the Xcode version being used.
 # Problem: CMake runs toolchain files multiple times, but can't read cache variables on some runs.
-# Workaround: On first run (in which cache variables are always accessible), set an intermediary environment variable.
+# Workaround: On the first run (in which cache variables are always accessible), set an intermediary environment variable.
 #
-# NOTE: This pattern is used i many places in this toolchain to speed up checks of all sorts
+# NOTE: This pattern is used in many places in this toolchain to speed up checks of all sorts
 if(DEFINED XCODE_VERSION_INT)
   # Environment variables are always preserved.
   set(ENV{_XCODE_VERSION_INT} "${XCODE_VERSION_INT}")
@@ -207,7 +207,7 @@ elseif(NOT DEFINED PLATFORM)
 endif ()
 
 if(PLATFORM MATCHES ".*COMBINED" AND NOT CMAKE_GENERATOR MATCHES "Xcode")
-  message(FATAL_ERROR "The combined builds support requires Xcode to be used as generator via '-G Xcode' command-line argument in CMake")
+  message(FATAL_ERROR "The combined builds support requires Xcode to be used as a generator via '-G Xcode' command-line argument in CMake")
 endif()
 
 # Safeguard that the platform value is set and is one of the supported values
@@ -223,7 +223,7 @@ if(PLATFORM MATCHES "^(MAC_ARM64)$|^(MAC_CATALYST_ARM64)$" AND ${CMAKE_VERSION} 
   message(FATAL_ERROR "Apple Silicon builds requires a minimum of CMake 3.19.5")
 endif()
 
-# Touch toolchain variable to suppress "unused variable" warning.
+# Touch the toolchain variable to suppress the "unused variable" warning.
 # This happens if CMake is invoked with the same command line the second time.
 if(CMAKE_TOOLCHAIN_FILE)
 endif()
@@ -240,29 +240,29 @@ if(NOT DEFINED NAMED_LANGUAGE_SUPPORT AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL
   message(STATUS "[DEFAULTS] Using explicit named language support! E.g., enable_language(CXX) is needed in the project files.")
 elseif(NOT DEFINED NAMED_LANGUAGE_SUPPORT AND ${CMAKE_VERSION} VERSION_LESS "3.16")
   set(NAMED_LANGUAGE_SUPPORT OFF)
-  message(STATUS "[DEFAULTS] Disabling explicit named language support. Falling back to legacy behaviour.")
+  message(STATUS "[DEFAULTS] Disabling explicit named language support. Falling back to legacy behavior.")
 elseif(DEFINED NAMED_LANGUAGE_SUPPORT AND ${CMAKE_VERSION} VERSION_LESS "3.16")
   message(FATAL_ERROR "CMake named language support for OBJC and OBJCXX was added in CMake 3.16.")
 endif()
 set(NAMED_LANGUAGE_SUPPORT_INT ${NAMED_LANGUAGE_SUPPORT} CACHE BOOL
         "Whether or not to enable explicit named language support" FORCE)
 
-# Specify minimum version of deployment target.
+# Specify the minimum version of the deployment target.
 if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM MATCHES "WATCHOS")
     # Unless specified, SDK version 4.0 is used by default as minimum target version (watchOS).
     set(DEPLOYMENT_TARGET "4.0")
   elseif(PLATFORM STREQUAL "MAC")
-    # Unless specified, SDK version 10.13 (High sierra) is used by default as minimum target version (macos).
+    # Unless specified, SDK version 10.13 (High Sierra) is used by default as the minimum target version (macos).
     set(DEPLOYMENT_TARGET "10.13")
   elseif(PLATFORM STREQUAL "MAC_ARM64")
-    # Unless specified, SDK version 11.0 (Big Sur) is used by default as minimum target version (macos on arm).
+    # Unless specified, SDK version 11.0 (Big Sur) is used by default as the minimum target version (macOS on arm).
     set(DEPLOYMENT_TARGET "11.0")
   elseif(PLATFORM STREQUAL "MAC_CATALYST" OR PLATFORM STREQUAL "MAC_CATALYST_ARM64")
-    # Unless specified, SDK version 13.0 is used by default as minimum target version (mac catalyst minimum requirement).
+    # Unless specified, SDK version 13.0 is used by default as the minimum target version (mac catalyst minimum requirement).
     set(DEPLOYMENT_TARGET "13.1")
   else()
-    # Unless specified, SDK version 11.0 is used by default as minimum target version (iOS, tvOS).
+    # Unless specified, SDK version 11.0 is used by default as the minimum target version (iOS, tvOS).
     set(DEPLOYMENT_TARGET "11.0")
   endif()
   message(STATUS "[DEFAULTS] Using the default min-version since DEPLOYMENT_TARGET not provided!")
@@ -302,7 +302,7 @@ elseif(PLATFORM_INT STREQUAL "OS64")
   set(SDK_NAME iphoneos)
   if(NOT ARCHS)
     if (XCODE_VERSION_INT VERSION_GREATER 10.0)
-      set(ARCHS arm64) # FIXME: Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
+      set(ARCHS arm64) # FIXME: Add arm64e when Apple has fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
     else()
       set(ARCHS arm64)
     endif()
@@ -315,7 +315,7 @@ elseif(PLATFORM_INT STREQUAL "OS64COMBINED")
   if(MODERN_CMAKE)
     if(NOT ARCHS)
       if (XCODE_VERSION_INT VERSION_GREATER 10.0)
-        set(ARCHS arm64 x86_64) # FIXME: Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missung bitcode markers for example
+        set(ARCHS arm64 x86_64) # FIXME: Add arm64e when Apple has fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
         set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphoneos*] "arm64")
         set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "x86_64")
         set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphoneos*] "arm64")
@@ -487,7 +487,7 @@ elseif(CMAKE_GENERATOR MATCHES "Xcode")
   endif()
 endif()
 
-# If user did not specify the SDK root to use, then query xcodebuild for it.
+# If the user did not specify the SDK root to use, then query xcodebuild for it.
 if(DEFINED CMAKE_OSX_SYSROOT_INT)
   # Environment variables are always preserved.
   set(ENV{_CMAKE_OSX_SYSROOT_INT} "${CMAKE_OSX_SYSROOT_INT}")
@@ -631,7 +631,7 @@ foreach(lang ${languages})
   set(CMAKE_${lang}_CREATE_STATIC_LIBRARY "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> " CACHE INTERNAL "")
 endforeach()
 
-# CMake 3.14+ support building for iOS, watchOS and tvOS out of the box.
+# CMake 3.14+ support building for iOS, watchOS, and tvOS out of the box.
 if(MODERN_CMAKE)
   if(SDK_NAME MATCHES "iphone")
     set(CMAKE_SYSTEM_NAME iOS)
@@ -651,7 +651,7 @@ elseif(NOT DEFINED CMAKE_SYSTEM_NAME AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL 
   # Legacy code path prior to CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
   set(CMAKE_SYSTEM_NAME iOS)
 elseif(NOT DEFINED CMAKE_SYSTEM_NAME)
-  # Legacy code path prior to CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
+  # Legacy code path before CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
   set(CMAKE_SYSTEM_NAME Darwin)
 endif()
 # Standard settings.
@@ -800,9 +800,9 @@ if(DEFINED APPLE_TARGET_TRIPLE)
   set(APPLE_TARGET_TRIPLE_FLAG "-target ${APPLE_TARGET_TRIPLE}")
 endif()
 
-#Check if Xcode generator is used, since that will handle these flags automagically
+#Check if Xcode generator is used since that will handle these flags automagically
 if(CMAKE_GENERATOR MATCHES "Xcode")
-  message(STATUS "Not setting any manual command-line buildflags, since Xcode is selected as generator. Modifying the Xcode build-settings directly instead.")
+  message(STATUS "Not setting any manual command-line buildflags, since Xcode is selected as the generator. Modifying the Xcode build-settings directly instead.")
 else()
   set(CMAKE_C_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${SDK_NAME_VERSION_FLAGS} ${OBJC_LEGACY_VARS} ${BITCODE} ${VISIBILITY} ${CMAKE_C_FLAGS}")
   set(CMAKE_C_FLAGS_DEBUG "-O0 -g ${CMAKE_C_FLAGS_DEBUG}")
