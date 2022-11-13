@@ -9,7 +9,7 @@ on:
 jobs:
   build_with_11_7_0_TVOS:
     name: "Xcode version 11.7.0, Target tvOS [arm64] Target SDK 11.0"
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       PLATFORM: TVOS
       DEPLOYMENT_TARGET: "11.0"

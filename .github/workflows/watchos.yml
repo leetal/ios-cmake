@@ -9,7 +9,7 @@ on:
 jobs:
   build_with_11_7_0_WATCHOS:
     name: "Xcode version 11.7.0, Target tvOS [armv7k, arm64_32] Target SDK 5.0"
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       PLATFORM: WATCHOS
       DEPLOYMENT_TARGET: "5.0"
@@ -22,7 +22,7 @@ jobs:
       run: ./.github/build.sh
   build_with_12_5_1_SIMULATOR_WATCHOS:
     name: "Xcode version 12_5_1, Target tvOS [x86_64] Target SDK 7.0"
-    runs-on: macos-latest
+    runs-on: macos-11
     env:
       PLATFORM: SIMULATOR_WATCHOS
       DEPLOYMENT_TARGET: "7.0"
