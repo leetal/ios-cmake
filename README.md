@@ -43,6 +43,7 @@ Tested with the following combinations:
 * _SIMULATOR_WATCHOS_ - to build for watchOS Simulator (i386)
 * _MAC_ - to build for macOS (x86_64)
 * _MAC_ARM64_ - to build for macOS on Apple Silicon (arm64)
+* _MAC_UNIVERSAL_ - to build for macOS on x86_64 and Apple Silicon (arm64) combined
 * _MAC_CATALYST_ - to build iOS for Mac (Catalyst, x86_64)
 * _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64)
 
