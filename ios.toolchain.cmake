@@ -967,7 +967,9 @@ if(NOT PLATFORM_INT MATCHES "^MAC.*$")
 endif()
 
 # Default to searching for frameworks first.
-set(CMAKE_FIND_FRAMEWORK FIRST)
+IF(NOT DEFINED CMAKE_FIND_FRAMEWORK)
+  set(CMAKE_FIND_FRAMEWORK FIRST)
+ENDIF(NOT DEFINED CMAKE_FIND_FRAMEWORK)
 
 # Set up the default search directories for frameworks.
 if(PLATFORM_INT MATCHES "^MAC_CATALYST") 
