@@ -65,6 +65,7 @@
 #    TVOS = Build for arm64 tvOS.
 #    TVOSCOMBINED = Build for arm64 x86_64 tvOS + tvOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_TVOS = Build for x86_64 tvOS Simulator.
+#    SIMULATORARM64_TVOS = Build for arm64 tvOS Simulator.
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS + watchOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
@@ -108,6 +109,7 @@
 #    SIMULATORARM64 = arm64
 #    TVOS = arm64
 #    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
+#    SIMULATORARM64_TVOS = arm64
 #    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
 #    MAC = x86_64
@@ -154,7 +156,7 @@ set(ENV{_IOS_TOOLCHAIN_HAS_RUN} true)
 # List of supported platform values
 list(APPEND _supported_platforms
         "OS" "OS64" "OS64COMBINED" "SIMULATOR" "SIMULATOR64" "SIMULATORARM64"
-        "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS"
+        "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS" "SIMULATORARM64_TVOS"
         "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS"
         "MAC" "MAC_ARM64" "MAC_UNIVERSAL"
         "MAC_CATALYST" "MAC_CATALYST_ARM64")
@@ -393,6 +395,14 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_TVOS")
   if(NOT ARCHS)
     set(ARCHS x86_64)
     set(APPLE_TARGET_TRIPLE_INT x86_64-apple-tvos${DEPLOYMENT_TARGET}-simulator)
+  else()
+    set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-tvos${DEPLOYMENT_TARGET}-simulator)
+  endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATORARM64_TVOS")
+  set(SDK_NAME appletvsimulator)
+  if(NOT ARCHS)
+    set(ARCHS arm64)
+    set(APPLE_TARGET_TRIPLE_INT arm64-apple-tvos${DEPLOYMENT_TARGET}-simulator)
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-tvos${DEPLOYMENT_TARGET}-simulator)
   endif()
@@ -736,6 +746,9 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11")
     set(SDK_NAME_VERSION_FLAGS
             "-mtvos-version-min=${DEPLOYMENT_TARGET}")
   elseif(PLATFORM_INT STREQUAL "SIMULATOR_TVOS")
+    set(SDK_NAME_VERSION_FLAGS
+            "-mtvos-simulator-version-min=${DEPLOYMENT_TARGET}")
+elseif(PLATFORM_INT STREQUAL "SIMULATORARM64_TVOS")
     set(SDK_NAME_VERSION_FLAGS
             "-mtvos-simulator-version-min=${DEPLOYMENT_TARGET}")
   elseif(PLATFORM_INT STREQUAL "WATCHOS")

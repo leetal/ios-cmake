@@ -38,6 +38,7 @@ Tested with the following combinations:
 * _TVOS_ - to build for tvOS (arm64)
 * _TVOSCOMBINED_ - to build for tvOS & tvOS Simulator (arm64, x86_64)
 * _SIMULATOR_TVOS_ - to build for tvOS Simulator (x86_64)
+* _SIMULATORARM64_TVOS_ = to build for tvOS Simulator (arm64)
 * _WATCHOS_ - to build for watchOS (armv7k, arm64_32)
 * _WATCHOSCOMBINED_ - to build for watchOS & Simulator (armv7k, arm64_32, i386)
 * _SIMULATOR_WATCHOS_ - to build for watchOS Simulator (i386)
