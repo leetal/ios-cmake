@@ -86,7 +86,7 @@ cmake --install . --config Release # Necessary to build combined library
 `APPLE_TARGET_TRIPLE` - Used by autoconf build systems. 
 
 ### Additional Options
-`-DENABLE_BITCODE=(BOOL)` - Enabled by default, specify FALSE or 0 to disable bitcode
+`-DENABLE_BITCODE=(BOOL)` - Disabled by default, specify TRUE or 1 to enable bitcode
 
 `-DENABLE_ARC=(BOOL)` - Enabled by default, specify FALSE or 0 to disable ARC
 
