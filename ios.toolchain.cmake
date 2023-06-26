@@ -157,7 +157,7 @@ list(APPEND _supported_platforms
         "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS"
         "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS"
         "MAC" "MAC_ARM64" "MAC_UNIVERSAL"
-        "XROS" "SIMULATOR_XROS"
+        "VISIONOS" "SIMULATOR_VISIONOS"
         "MAC_CATALYST" "MAC_CATALYST_ARM64")
 
 # Cache what generator is used
@@ -258,8 +258,8 @@ if(NOT DEFINED DEPLOYMENT_TARGET)
   elseif(PLATFORM STREQUAL "MAC")
     # Unless specified, SDK version 10.13 (High Sierra) is used by default as the minimum target version (macos).
     set(DEPLOYMENT_TARGET "10.13")
-  elseif(PLATFORM STREQUAL "XROS" OR PLATFORM STREQUAL "SIMULATOR_XROS")
-    # xrOS
+  elseif(PLATFORM STREQUAL "VISIONOS" OR PLATFORM STREQUAL "SIMULATOR_VISIONOS")
+    # Unless specified, SDK version 1.0 is used by default as minimum target version (visionOS).
     set(DEPLOYMENT_TARGET "1.0")
   elseif(PLATFORM STREQUAL "MAC_ARM64")
     # Unless specified, SDK version 11.0 (Big Sur) is used by default as the minimum target version (macOS on arm).
@@ -413,7 +413,7 @@ elseif(PLATFORM_INT STREQUAL "WATCHOS")
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-watchos${DEPLOYMENT_TARGET})
   endif()
-elseif(PLATFORM_INT STREQUAL "SIMULATOR_XROS")
+elseif(PLATFORM_INT STREQUAL "SIMULATOR_VISIONOS")
   set(SDK_NAME xrsimulator)
   if(NOT ARCHS)
     set(ARCHS arm64)
@@ -421,7 +421,7 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_XROS")
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-xros${DEPLOYMENT_TARGET}-simulator)
   endif()
-elseif(PLATFORM_INT STREQUAL "XROS")
+elseif(PLATFORM_INT STREQUAL "VISIONOS")
   set(SDK_NAME xros)
   if(NOT ARCHS)
     set(ARCHS arm64)
@@ -668,9 +668,9 @@ if(MODERN_CMAKE)
   if(SDK_NAME MATCHES "iphone")
     set(CMAKE_SYSTEM_NAME iOS)
   elseif(SDK_NAME MATCHES "xros")
-      set(CMAKE_SYSTEM_NAME xrOS)
+      set(CMAKE_SYSTEM_NAME visionOS)
   elseif(SDK_NAME MATCHES "xrsimulator")
-      set(CMAKE_SYSTEM_NAME xrOS)
+      set(CMAKE_SYSTEM_NAME visionOS)
   elseif(SDK_NAME MATCHES "macosx")
     set(CMAKE_SYSTEM_NAME Darwin)
   elseif(SDK_NAME MATCHES "appletv")
@@ -756,10 +756,10 @@ if(${CMAKE_VERSION} VERSION_LESS "3.11")
       set(SDK_NAME_VERSION_FLAGS
               "-m${SDK_NAME}-version-min=${DEPLOYMENT_TARGET}")
     endif()
-  elseif(PLATFORM_INT STREQUAL "XROS")
+  elseif(PLATFORM_INT STREQUAL "VISIONOS")
     set(SDK_NAME_VERSION_FLAGS
             "-mxros-version-min=${DEPLOYMENT_TARGET}")
-  elseif(PLATFORM_INT STREQUAL "SIMULATOR_XROS")
+  elseif(PLATFORM_INT STREQUAL "SIMULATOR_VISIONOS")
     set(SDK_NAME_VERSION_FLAGS
             "-mxrsimulator-version-min=${DEPLOYMENT_TARGET}")
   elseif(PLATFORM_INT STREQUAL "TVOS")
