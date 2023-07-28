@@ -62,6 +62,7 @@
 #    SIMULATOR = Build for x86 i386 iphoneOS Simulator.
 #    SIMULATOR64 = Build for x86_64 iphoneOS Simulator.
 #    SIMULATORARM64 = Build for arm64 iphoneOS Simulator.
+#    SIMULATOR64COMBINED = Build for arm64 x86_64 iphoneOS Simulator. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
 #    TVOS = Build for arm64 tvOS.
 #    TVOSCOMBINED = Build for arm64 x86_64 tvOS + tvOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_TVOS = Build for x86_64 tvOS Simulator.
@@ -155,7 +156,7 @@ set(ENV{_IOS_TOOLCHAIN_HAS_RUN} true)
 
 # List of supported platform values
 list(APPEND _supported_platforms
-        "OS" "OS64" "OS64COMBINED" "SIMULATOR" "SIMULATOR64" "SIMULATORARM64"
+        "OS" "OS64" "OS64COMBINED" "SIMULATOR" "SIMULATOR64" "SIMULATORARM64" "SIMULATOR64COMBINED"
         "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS" "SIMULATORARM64_TVOS"
         "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS"
         "MAC" "MAC_ARM64" "MAC_UNIVERSAL"
@@ -196,10 +197,10 @@ endif()
 
 # Assuming that xcode 12.0 is installed you most probably have ios sdk 14.0 or later installed (tested on Big Sur)
 # if you don't set a deployment target it will be set the way you only get 64-bit builds
-if(NOT DEFINED DEPLOYMENT_TARGET AND XCODE_VERSION_INT VERSION_GREATER 12.0)
-  # Temporarily fix the arm64 issues in CMake install-combined by excluding arm64 for simulator builds (needed for Apple Silicon...)
-  set(CMAKE_XCODE_ATTRIBUTE_EXCLUDED_ARCHS[sdk=iphonesimulator*] "arm64")
-endif()
+#if(NOT DEFINED DEPLOYMENT_TARGET AND XCODE_VERSION_INT VERSION_GREATER 12.0)
+# Temporarily fix the arm64 issues in CMake install-combined by excluding arm64 for simulator builds (needed for Apple Silicon...)
+#  set(CMAKE_XCODE_ATTRIBUTE_EXCLUDED_ARCHS[sdk=iphonesimulator*] "arm64")
+#endif()
 
 # Check if the platform variable is set
 if(DEFINED PLATFORM)
@@ -344,6 +345,30 @@ elseif(PLATFORM_INT STREQUAL "OS64COMBINED")
     endif()
   else()
     message(FATAL_ERROR "Please make sure that you are running CMake 3.14+ to make the OS64COMBINED setting work")
+  endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATOR64COMBINED")
+  set(SDK_NAME iphonesimulator)
+  if(MODERN_CMAKE)
+    if(NOT ARCHS)
+      if (XCODE_VERSION_INT VERSION_GREATER 12.0)
+        set(ARCHS arm64 x86_64) # FIXME: Add arm64e when Apple have fixed the integration issues with it, libarclite_iphoneos.a is currently missing bitcode markers for example
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphoneos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "x86_64 arm64")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphoneos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphonesimulator*] "x86_64 arm64")
+      else()
+        set(ARCHS arm64 x86_64)
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphoneos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "x86_64")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphoneos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphonesimulator*] "x86_64")
+      endif()
+      set(APPLE_TARGET_TRIPLE_INT aarch64-x86_64-apple-ios${DEPLOYMENT_TARGET}-simulator)
+    else()
+      set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-ios${DEPLOYMENT_TARGET}-simulator)
+    endif()
+  else()
+    message(FATAL_ERROR "Please make sure that you are running CMake 3.14+ to make the SIMULATOR64COMBINED setting work")
   endif()
 elseif(PLATFORM_INT STREQUAL "SIMULATOR")
   set(SDK_NAME iphonesimulator)
