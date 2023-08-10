@@ -719,8 +719,14 @@ if(MODERN_CMAKE)
   endif()
   # Provide flags for a combined FAT library build on newer CMake versions
   if(PLATFORM_INT MATCHES ".*COMBINED")
-    set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
     set(CMAKE_IOS_INSTALL_COMBINED YES)
+    if(CMAKE_GENERATOR MATCHES "Xcode")
+      # Set the SDKROOT Xcode properties to a Xcode-friendly value (the SDK_NAME, E.g, iphoneos)
+      # This way, Xcode will automatically switch between the simulator and device SDK when building.
+      set(CMAKE_XCODE_ATTRIBUTE_SDKROOT "${SDK_NAME}")
+      # Force to not build just one ARCH, but all!
+      set(CMAKE_XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
+    endif()
   endif()
 elseif(NOT DEFINED CMAKE_SYSTEM_NAME AND ${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.10")
   # Legacy code path prior to CMake 3.14 or fallback if no CMAKE_SYSTEM_NAME specified
