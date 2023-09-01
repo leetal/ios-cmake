@@ -48,22 +48,20 @@ Tested with the following combinations:
 * _MAC_CATALYST_ - to build iOS for Mac (Catalyst, x86_64)
 * _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64)
 
-# Example usage 
+# Example usage
 **_NOTE_: Change the `-DPLATFORM` to an applicable value if targeting another platform.**
 
 ```bash
 cd example/example-lib
-mkdir build
-cd build
-cmake .. -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS64
-cmake --build . --config Release
+cmake -B build -G Xcode -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DPLATFORM=OS64
+cmake --build build --config Release
 ```
 
 This will build the library for the given PLATFORM. In this case, iOS with the arm64 architecture.
 
 ### COMBINED Options
-The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) will build complete FAT-libraries for 
-the given platform. These FAT-libraries include slices for both device and simulator, making the distribution and 
+The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) will build complete FAT-libraries for
+the given platform. These FAT-libraries include slices for both device and simulator, making the distribution and
 usage of the library much more simple!
 
 Example:
@@ -84,7 +82,7 @@ cmake --install . --config Release # Necessary to build combined library
 
 `CMAKE_OSX_ARCHITECTURES` - Architectures being compiled for (generated from PLATFORM).
 
-`APPLE_TARGET_TRIPLE` - Used by autoconf build systems. 
+`APPLE_TARGET_TRIPLE` - Used by autoconf build systems.
 
 ### Additional Options
 `-DENABLE_BITCODE=(BOOL)` - Disabled by default, specify TRUE or 1 to enable bitcode
@@ -97,7 +95,7 @@ cmake --install . --config Release # Necessary to build combined library
 
 `-DARCHS=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DPLATFORM` (see above)
 
-__*To combine all platforms into the same FAT-library, either build any of the "*COMBINED*" platform types OR use the 
+__*To combine all platforms into the same FAT-library, either build any of the "*COMBINED*" platform types OR use the
 LIPO tool. More information on how to combine libraries with LIPO is readily available on the net.*__
 
 ## Thanks To
