@@ -88,7 +88,7 @@
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
 #
-# DEPLOYMENT_TARGET: Minimum SDK version to target. Default 2.0 on watchOS and 9.0 on tvOS+iOS
+# DEPLOYMENT_TARGET: Minimum SDK version to target. Default 6.0 on watchOS, 13.0 on tvOS+iOS/iPadOS, 11.0 on macOS, 1.0 on visionOS
 #
 # NAMED_LANGUAGE_SUPPORT:
 #    ON (default) = Will require "enable_language(OBJC) and/or enable_language(OBJCXX)" for full OBJC|OBJCXX support
@@ -259,10 +259,10 @@ set(NAMED_LANGUAGE_SUPPORT_INT ${NAMED_LANGUAGE_SUPPORT} CACHE BOOL
 if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM MATCHES "WATCHOS")
     # Unless specified, SDK version 4.0 is used by default as minimum target version (watchOS).
-    set(DEPLOYMENT_TARGET "4.0")
+    set(DEPLOYMENT_TARGET "6.0")
   elseif(PLATFORM STREQUAL "MAC")
     # Unless specified, SDK version 10.13 (High Sierra) is used by default as the minimum target version (macos).
-    set(DEPLOYMENT_TARGET "10.13")
+    set(DEPLOYMENT_TARGET "11.0")
   elseif(PLATFORM STREQUAL "VISIONOS" OR PLATFORM STREQUAL "SIMULATOR_VISIONOS" OR PLATFORM STREQUAL "SIMULATOR64_VISIONOS")
     # Unless specified, SDK version 1.0 is used by default as minimum target version (visionOS).
     set(DEPLOYMENT_TARGET "1.0")
@@ -277,7 +277,7 @@ if(NOT DEFINED DEPLOYMENT_TARGET)
     set(DEPLOYMENT_TARGET "13.1")
   else()
     # Unless specified, SDK version 11.0 is used by default as the minimum target version (iOS, tvOS).
-    set(DEPLOYMENT_TARGET "11.0")
+    set(DEPLOYMENT_TARGET "13.0")
   endif()
   message(STATUS "[DEFAULTS] Using the default min-version since DEPLOYMENT_TARGET not provided!")
 elseif(DEFINED DEPLOYMENT_TARGET AND PLATFORM MATCHES "^MAC_CATALYST" AND ${DEPLOYMENT_TARGET} VERSION_LESS "13.1")
