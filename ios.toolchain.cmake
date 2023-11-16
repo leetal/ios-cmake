@@ -70,6 +70,7 @@
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS + watchOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
+#    SIMULATORARM64_WATCHOS = Build for arm64 for watchOS Simulator.
 #    MAC = Build for x86_64 macOS.
 #    MAC_ARM64 = Build for Apple Silicon macOS.
 #    MAC_UNIVERSAL = Combined build for x86_64 and Apple Silicon on macOS.
@@ -113,6 +114,7 @@
 #    SIMULATORARM64_TVOS = arm64
 #    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
+#    SIMULATORARM64_WATCHOS = arm64
 #    MAC = x86_64
 #    MAC_ARM64 = arm64
 #    MAC_UNIVERSAL = x86_64 arm64
@@ -158,7 +160,7 @@ set(ENV{_IOS_TOOLCHAIN_HAS_RUN} true)
 list(APPEND _supported_platforms
         "OS" "OS64" "OS64COMBINED" "SIMULATOR" "SIMULATOR64" "SIMULATORARM64" "SIMULATOR64COMBINED"
         "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS" "SIMULATORARM64_TVOS"
-        "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS"
+        "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS" "SIMULATORARM64_WATCHOS"
         "MAC" "MAC_ARM64" "MAC_UNIVERSAL"
         "VISIONOS" "SIMULATOR_VISIONOS" "SIMULATOR64_VISIONOS"
         "MAC_CATALYST" "MAC_CATALYST_ARM64")
@@ -478,6 +480,14 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
   if(NOT ARCHS)
     set(ARCHS i386)
     set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+  else()
+    set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+  endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATORARM64_WATCHOS")
+  set(SDK_NAME watchsimulator)
+  if(NOT ARCHS)
+    set(ARCHS arm64)
+    set(APPLE_TARGET_TRIPLE_INT arm64-apple-watchos${DEPLOYMENT_TARGET}-simulator)
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-watchos${DEPLOYMENT_TARGET}-simulator)
   endif()
@@ -814,6 +824,9 @@ elseif(PLATFORM_INT STREQUAL "SIMULATORARM64_TVOS")
     set(SDK_NAME_VERSION_FLAGS
             "-mwatchos-version-min=${DEPLOYMENT_TARGET}")
   elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
+    set(SDK_NAME_VERSION_FLAGS
+            "-mwatchos-simulator-version-min=${DEPLOYMENT_TARGET}")
+  elseif(PLATFORM_INT STREQUAL "SIMULATORARM64_WATCHOS")
     set(SDK_NAME_VERSION_FLAGS
             "-mwatchos-simulator-version-min=${DEPLOYMENT_TARGET}")
   elseif(PLATFORM_INT STREQUAL "MAC")
