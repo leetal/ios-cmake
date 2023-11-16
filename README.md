@@ -1,32 +1,10 @@
 A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development with full simulator support and toggleable options!
 
-### NEW!
-
-* Experimental Catalyst support (iOS on macOS)
-* macOS support and experimental Apple Silicon support
-* Deprecated options now removed.
-* Builds now run on Github Actions
-
 # ios-cmake
 
 [![catalyst-jobs](https://github.com/leetal/ios-cmake/actions/workflows/catalyst.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/catalyst.yml) &nbsp; [![combined-jobs](https://github.com/leetal/ios-cmake/actions/workflows/combined.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/combined.yml) &nbsp; [![ios-jobs](https://github.com/leetal/ios-cmake/actions/workflows/ios.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/ios.yml)
 
 [![macos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/macos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/macos.yml) &nbsp; [![tvos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/tvos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/tvos.yml) &nbsp; [![watchos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/watchos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/watchos.yml)
-
-Tested with the following combinations:
-
-* XCode 11.7
-  * iOS SDK 9.0 & 11.0
-  * watchOS SDK 5.0
-  * tvOS SDK 11.0
-* XCode 12.5.1
-  * iOS SDK 12.0
-  * watchOS SDK 7.0
-  * macOS SDK 10.13
-  * iOS, watchOS, tvOS combined builds, mixed SDKs
-* XCode 13.2
-  * Mac Catalyst SDK 13.0
-  * macOS SDK 11.0
 
 ## Platform flag options (-DPLATFORM=_flag_)
 
@@ -43,6 +21,7 @@ Tested with the following combinations:
 * _WATCHOS_ - to build for watchOS (armv7k, arm64_32)
 * _WATCHOSCOMBINED_ - to build for watchOS & Simulator (armv7k, arm64_32, i386)
 * _SIMULATOR_WATCHOS_ - to build for watchOS Simulator (i386)
+* _SIMULATORARM64_WATCHOS_ = to build for watchOS Simulator (arm64)
 * _MAC_ - to build for macOS (x86_64)
 * _MAC_ARM64_ - to build for macOS on Apple Silicon (arm64)
 * _MAC_UNIVERSAL_ - to build for macOS on x86_64 and Apple Silicon (arm64) combined
