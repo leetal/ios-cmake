@@ -7,16 +7,16 @@ on:
     types: [ opened, synchronize ]
 
 jobs:
-  build_with_15_0_TVOS:
-    name: "Xcode version 15.0, Target tvOS [arm64] Target SDK 14.0"
+  build_with_15_0_1_TVOS:
+    name: "Xcode version 15.0.1, Target tvOS [arm64] Target SDK 14.0"
     runs-on: macos-13
     env:
       PLATFORM: TVOS
-      DEPLOYMENT_TARGET: "14.0"
+      DEPLOYMENT_TARGET: 14.0
     steps:
     - uses: actions/checkout@v2
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0'
+        xcode-version: '15.0.1'
     - name: Build
       run: ./.github/build.sh
