@@ -27,6 +27,7 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 * _MAC_UNIVERSAL_ - to build for macOS on x86_64 and Apple Silicon (arm64) combined
 * _MAC_CATALYST_ - to build iOS for Mac (Catalyst, x86_64)
 * _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64)
+* _MAC_CATALYST_UNIVERSAL_ - to build iOS for Mac on x86_64 and Mac on arm64 combined
 
 # Example usage
 
