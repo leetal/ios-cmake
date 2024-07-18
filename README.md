@@ -6,14 +6,18 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 
 [![macos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/macos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/macos.yml) &nbsp; [![tvos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/tvos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/tvos.yml) &nbsp; [![watchos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/watchos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/watchos.yml)
 
+[![visionos-jobs](https://github.com/leetal/ios-cmake/actions/workflows/visionos.yml/badge.svg)](https://github.com/leetal/ios-cmake/actions/workflows/visionos.yml)
+
 ## Platform flag options (-DPLATFORM=_flag_)
 
-* _OS_ - to build for iOS (armv7, armv7s, arm64) **DEPRECATED in favour of OS64**
+* _OS_ - to build for iOS (armv7, armv7s, arm64) -- **DEPRECATED in favour of OS64**
 * _OS64_ - to build for iOS (arm64 only)
 * _OS64COMBINED_ - to build for iOS & iOS Simulator (FAT lib) (arm64, x86_64)
-* _SIMULATOR_ - to build for iOS simulator 32 bit (i386) **DEPRECATED**
+* _SIMULATOR_ - to build for iOS simulator 32 bit (i386) -- **DEPRECATED**
 * _SIMULATOR64_ - to build for iOS simulator 64 bit (x86_64)
 * _SIMULATORARM64_ - to build for iOS simulator 64 bit (arm64)
+* _VISIONOS_ - to build for visionOS (arm64) -- **Apple Silicon Required**
+* _SIMULATOR_VISIONOS_ - to build for visionOS Simulator (arm64) -- **Apple Silicon Required**
 * _TVOS_ - to build for tvOS (arm64)
 * _TVOSCOMBINED_ - to build for tvOS & tvOS Simulator (arm64, x86_64)
 * _SIMULATOR_TVOS_ - to build for tvOS Simulator (x86_64)
@@ -24,9 +28,9 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 * _SIMULATORARM64_WATCHOS_ = to build for watchOS Simulator (arm64)
 * _MAC_ - to build for macOS (x86_64)
 * _MAC_ARM64_ - to build for macOS on Apple Silicon (arm64)
-* _MAC_UNIVERSAL_ - to build for macOS on x86_64 and Apple Silicon (arm64) combined
+* _MAC_UNIVERSAL_ - to build for macOS on x86_64 and Apple Silicon (arm64) combined -- **Apple Silicon Required**
 * _MAC_CATALYST_ - to build iOS for Mac (Catalyst, x86_64)
-* _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64)
+* _MAC_CATALYST_ARM64_ - to build iOS for Mac on Apple Silicon (Catalyst, arm64) -- **Apple Silicon Required**
 
 # Example usage
 
@@ -85,6 +89,5 @@ LIPO tool. More information on how to combine libraries with LIPO is readily ava
 
 ## Thanks To
 
-* [natbro](https://github.com/natbro) for adding tvOS support
-* [MSNexploder](https://github.com/MSNexploder) for adding OS64 and arm64e support
-* [garryyan](https://github.com/garryyan) for adding watchOS support
+* 🌟 A heartfelt thank you to everyone who contributes to keeping this repository up-to-date! Your support and collaboration are invaluable in managing and tracking all the changes. Your help is greatly appreciated! 🙏🎉
+
