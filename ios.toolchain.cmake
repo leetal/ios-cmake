@@ -155,7 +155,7 @@ cmake_minimum_required(VERSION 3.8.0)
 
 # CMake invokes the toolchain file twice during the first build, but only once during subsequent rebuilds.
 # NOTE: To improve single-library build-times, provide the flag "OS_SINGLE_BUILD" as a build argument.
-if(NOT DEFINED OS_SINGLE_BUILD AND DEFINED ENV{_IOS_TOOLCHAIN_HAS_RUN})
+if(DEFINED OS_SINGLE_BUILD AND DEFINED ENV{_IOS_TOOLCHAIN_HAS_RUN})
   return()
 endif()
 set(ENV{_IOS_TOOLCHAIN_HAS_RUN} true)
