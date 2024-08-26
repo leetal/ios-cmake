@@ -67,9 +67,10 @@
 #    TVOSCOMBINED = Build for arm64 x86_64 tvOS + tvOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_TVOS = Build for x86_64 tvOS Simulator.
 #    SIMULATORARM64_TVOS = Build for arm64 tvOS Simulator.
-#    VISIONOSCOMBINED = Build for arm64 visionOS + visionOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
+#    VISIONOSCOMBINED = Build for arm64 x86_64 visionOS Simulator and arm64 visionOS. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    VISIONOS = Build for arm64 visionOS.
 #    SIMULATOR_VISIONOS = Build for arm64 visionOS Simulator.
+#    SIMULATOR64_VISIONOS = Build for x86_64 visionOS Simulator.
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS + watchOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
@@ -168,7 +169,7 @@ list(APPEND _supported_platforms
         "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS" "SIMULATORARM64_TVOS"
         "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS" "SIMULATORARM64_WATCHOS"
         "MAC" "MAC_ARM64" "MAC_UNIVERSAL"
-        "VISIONOS" "SIMULATOR_VISIONOS" "VISIONOSCOMBINED" 
+        "VISIONOS" "SIMULATOR_VISIONOS" "VISIONOSCOMBINED", "SIMULATOR64_VISIONOS"
         "MAC_CATALYST" "MAC_CATALYST_ARM64" "MAC_CATALYST_UNIVERSAL")
 
 # Cache what generator is used
@@ -269,7 +270,7 @@ if(NOT DEFINED DEPLOYMENT_TARGET)
   elseif(PLATFORM STREQUAL "MAC")
     # Unless specified, SDK version 10.13 (High Sierra) is used by default as the minimum target version (macos).
     set(DEPLOYMENT_TARGET "11.0")
-  elseif(PLATFORM STREQUAL "VISIONOS" OR PLATFORM STREQUAL "SIMULATOR_VISIONOS" OR PLATFORM STREQUAL "VISIONOSCOMBINED")
+  elseif(PLATFORM STREQUAL "VISIONOS")
     # Unless specified, SDK version 1.0 is used by default as minimum target version (visionOS).
     set(DEPLOYMENT_TARGET "1.0")
   elseif(PLATFORM STREQUAL "MAC_ARM64")
@@ -505,6 +506,14 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_VISIONOS")
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-xros${DEPLOYMENT_TARGET}-simulator)
   endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATOR64_VISIONOS")
+  set(SDK_NAME xrsimulator)
+  if(NOT ARCHS)
+    set(ARCHS x86_64)
+    set(APPLE_TARGET_TRIPLE_INT x86_64-apple-xros${DEPLOYMENT_TARGET}-simulator)
+  else()
+    set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-xros${DEPLOYMENT_TARGET}-simulator)
+  endif()
 elseif(PLATFORM_INT STREQUAL "VISIONOS")
   set(SDK_NAME xros)
   if(NOT ARCHS)
@@ -520,7 +529,7 @@ elseif(PLATFORM_INT STREQUAL "VISIONOSCOMBINED")
       set(ARCHS arm64)
       set(APPLE_TARGET_TRIPLE_INT arm64-apple-xros${DEPLOYMENT_TARGET})
       set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=xros*] "arm64")
-      set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=xrsimulator*] "arm64")
+      set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=xrsimulator*] "x86_64 arm64")
     else()
       set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-xros${DEPLOYMENT_TARGET})
     endif()
@@ -774,7 +783,7 @@ if(PLATFORM STREQUAL "MAC" OR PLATFORM STREQUAL "MAC_ARM64" OR PLATFORM STREQUAL
 elseif(PLATFORM STREQUAL "MAC_CATALYST" OR PLATFORM STREQUAL "MAC_CATALYST_ARM64" OR PLATFORM STREQUAL "MAC_CATALYST_UNIVERSAL")
   set(IOS ON CACHE BOOL "")
   set(MACOS ON CACHE BOOL "")
-elseif(PLATFORM STREQUAL "VISIONOS" OR PLATFORM STREQUAL "SIMULATOR_VISIONOS" OR PLATFORM STREQUAL "VISIONOSCOMBINED")
+elseif(PLATFORM STREQUAL "VISIONOS" OR PLATFORM STREQUAL "SIMULATOR_VISIONOS" OR PLATFORM STREQUAL "VISIONOSCOMBINED" OR PLATFORM STREQUAL "SIMULATOR64_VISIONOS")
   set(IOS OFF CACHE BOOL "")
   set(VISIONOS ON CACHE BOOL "")
 else()
