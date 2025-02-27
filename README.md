@@ -25,10 +25,10 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 * _SIMULATOR_TVOS_ - to build for tvOS Simulator (x86_64)
 * _SIMULATORARM64_TVOS_ = to build for tvOS Simulator (arm64)
 * _WATCHOS_ - to build for watchOS (armv7k, arm64_32)
-* _WATCHOSCOMBINED_ - to build for watchOS & Simulator (armv7k, arm64_32, i386)
-* _SIMULATOR_WATCHOS_ - to build for watchOS Simulator (i386)
+* _WATCHOSCOMBINED_ - to build for watchOS & Simulator (armv7k, arm64_32, x86_64)
+* _SIMULATOR_WATCHOS_ - to build for watchOS Simulator (x86_64)
 * _SIMULATORARM64_WATCHOS_ = to build for watchOS Simulator (arm64)
-* _SIMULATOR_WATCHOSCOMBINED_ = to build for watchOS Simulator (FAT lib) (arm64, i386)
+* _SIMULATOR_WATCHOSCOMBINED_ = to build for watchOS Simulator (FAT lib) (arm64, x86_64)
 * _MAC_ - to build for macOS (x86_64)
 * _MAC_ARM64_ - to build for macOS on Apple Silicon (arm64)
 * _MAC_UNIVERSAL_ - to build for macOS on x86_64 and Apple Silicon (arm64) combined
