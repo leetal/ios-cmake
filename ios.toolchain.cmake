@@ -74,6 +74,7 @@
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS + watchOS Simulator. Combined into FAT STATIC lib (only supported on 3.14+ of CMake with "-G Xcode" argument in combination with the "cmake --install" CMake build step)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
 #    SIMULATORARM64_WATCHOS = Build for arm64 for watchOS Simulator.
+#    SIMULATOR_WATCHOSCOMBINED = Build for arm64 x86_64 for watchOS Simulator. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
 #    MAC = Build for x86_64 macOS.
 #    MAC_ARM64 = Build for Apple Silicon macOS.
 #    MAC_UNIVERSAL = Combined build for x86_64 and Apple Silicon on macOS.
@@ -166,9 +167,9 @@ set(ENV{_IOS_TOOLCHAIN_HAS_RUN} true)
 list(APPEND _supported_platforms
         "OS" "OS64" "OS64COMBINED" "SIMULATOR" "SIMULATOR64" "SIMULATORARM64" "SIMULATOR64COMBINED"
         "TVOS" "TVOSCOMBINED" "SIMULATOR_TVOS" "SIMULATORARM64_TVOS"
-        "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS" "SIMULATORARM64_WATCHOS"
+        "WATCHOS" "WATCHOSCOMBINED" "SIMULATOR_WATCHOS" "SIMULATORARM64_WATCHOS" "SIMULATOR_WATCHOSCOMBINED"
         "MAC" "MAC_ARM64" "MAC_UNIVERSAL"
-        "VISIONOS" "SIMULATOR_VISIONOS" "VISIONOSCOMBINED" 
+        "VISIONOS" "SIMULATOR_VISIONOS" "VISIONOSCOMBINED"
         "MAC_CATALYST" "MAC_CATALYST_ARM64" "MAC_CATALYST_UNIVERSAL")
 
 # Cache what generator is used
@@ -316,7 +317,7 @@ if(PLATFORM_INT STREQUAL "OS")
     set(ARCHS armv7 armv7s arm64)
     set(APPLE_TARGET_TRIPLE_INT arm-apple-ios${DEPLOYMENT_TARGET})
   else()
-    set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-ios${DEPLOYMENT_TARGET})  
+    set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-ios${DEPLOYMENT_TARGET})
   endif()
 elseif(PLATFORM_INT STREQUAL "OS64")
   set(SDK_NAME iphoneos)
@@ -461,12 +462,12 @@ elseif(PLATFORM_INT STREQUAL "WATCHOSCOMBINED")
   if(MODERN_CMAKE)
     if(NOT ARCHS)
       if (XCODE_VERSION_INT VERSION_GREATER 10.0)
-        set(ARCHS armv7k arm64_32 i386)
-        set(APPLE_TARGET_TRIPLE_INT arm64_32-i386-apple-watchos${DEPLOYMENT_TARGET})
+        set(ARCHS armv7k arm64_32 x86_64)
+        set(APPLE_TARGET_TRIPLE_INT arm64_32-x86_64-apple-watchos${DEPLOYMENT_TARGET})
         set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchos*] "armv7k arm64_32")
-        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchsimulator*] "i386")
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchsimulator*] "x86_64")
         set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchos*] "armv7k arm64_32")
-        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchsimulator*] "i386")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchsimulator*] "x86_64")
       else()
         set(ARCHS armv7k i386)
         set(APPLE_TARGET_TRIPLE_INT arm-i386-apple-watchos${DEPLOYMENT_TARGET})
@@ -484,8 +485,13 @@ elseif(PLATFORM_INT STREQUAL "WATCHOSCOMBINED")
 elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
   set(SDK_NAME watchsimulator)
   if(NOT ARCHS)
-    set(ARCHS i386)
-    set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+    if (XCODE_VERSION_INT VERSION_GREATER 10.0)
+      set(ARCHS x86_64)
+      set(APPLE_TARGET_TRIPLE_INT x86_64-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+    else()
+      set(ARCHS i386)
+      set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+    endif()
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-watchos${DEPLOYMENT_TARGET}-simulator)
   endif()
@@ -496,6 +502,31 @@ elseif(PLATFORM_INT STREQUAL "SIMULATORARM64_WATCHOS")
     set(APPLE_TARGET_TRIPLE_INT arm64-apple-watchos${DEPLOYMENT_TARGET}-simulator)
   else()
     set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+  endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOSCOMBINED")
+  set(SDK_NAME watchsimulator)
+  if(MODERN_CMAKE)
+    if(NOT ARCHS)
+      if (XCODE_VERSION_INT VERSION_GREATER 12.0)
+        set(ARCHS arm64 x86_64)
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchsimulator*] "arm64 x86_64")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchsimulator*] "arm64 x86_64")
+        set(APPLE_TARGET_TRIPLE_INT arm64_x86_64-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+      else()
+        set(ARCHS arm64 i386)
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=watchsimulator*] "i386")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchos*] "")
+        set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=watchsimulator*] "i386")
+        set(APPLE_TARGET_TRIPLE_INT arm64_i386-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+      endif()
+    else()
+      set(APPLE_TARGET_TRIPLE_INT ${ARCHS_SPLIT}-apple-watchos${DEPLOYMENT_TARGET}-simulator)
+    endif()
+  else()
+    message(FATAL_ERROR "Please make sure that you are running CMake 3.14+ to make the SIMULATOR_WATCHOSCOMBINED setting work")
   endif()
 elseif(PLATFORM_INT STREQUAL "SIMULATOR_VISIONOS")
   set(SDK_NAME xrsimulator)
@@ -1049,7 +1080,7 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
 )
 
 if(NAMED_LANGUAGE_SUPPORT_INT)
-  list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES 
+  list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
         CMAKE_OBJC_FLAGS
         CMAKE_OBJC_DEBUG
         CMAKE_OBJC_MINSIZEREL
@@ -1087,7 +1118,7 @@ IF(NOT DEFINED CMAKE_FIND_FRAMEWORK)
 ENDIF(NOT DEFINED CMAKE_FIND_FRAMEWORK)
 
 # Set up the default search directories for frameworks.
-if(PLATFORM_INT MATCHES "^MAC_CATALYST") 
+if(PLATFORM_INT MATCHES "^MAC_CATALYST")
   set(CMAKE_FRAMEWORK_PATH
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
