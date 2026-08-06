@@ -10,10 +10,8 @@ A CMake toolchain file for iOS (+ Catalyst), watchOS, tvOS and macOS development
 
 ## Platform flag options (-DPLATFORM=_flag_)
 
-* _OS_ - to build for iOS (armv7, armv7s, arm64) -- **DEPRECATED in favour of OS64**
 * _OS64_ - to build for iOS (arm64 only)
-* _OS64COMBINED_ - to build for iOS & iOS Simulator (FAT lib) (arm64, x86_64)
-* _SIMULATOR_ - to build for iOS simulator 32 bit (i386) -- **DEPRECATED**
+* _OS64COMBINED_ - to build for iOS & iOS Simulator (FAT lib) (arm64, x86_64) -- **DEPRECATED, prefer xcframeworks (see below)**
 * _SIMULATOR64_ - to build for iOS simulator 64 bit (x86_64)
 * _SIMULATORARM64_ - to build for iOS simulator 64 bit (arm64)
 * _SIMULATOR64COMBINED_ - to build for iOS simulator 64 bit (FAT lib) (arm64, x86_64)
@@ -48,11 +46,36 @@ cmake --build build --config Release
 
 This will build the library for the given PLATFORM. In this case, iOS with the arm64 architecture.
 
-## COMBINED Options
+## Distributing for device + simulator: use an xcframework
 
-The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) will build complete FAT-libraries for
-the given platform. These FAT-libraries include slices for both device and simulator, making the distribution and
-usage of the library much more simple!
+A fat library can not contain both a device arm64 slice and a simulator arm64 slice, which makes the old
+"combined" FAT-library approach a dead end on Apple Silicon. Apple's (and CMake's) supported way to ship
+one artifact for both device and simulator is an **xcframework**. Build each platform in its own build
+directory and combine them:
+
+```bash
+cmake -S . -B build-device -G Xcode -DCMAKE_TOOLCHAIN_FILE=ios.toolchain.cmake -DPLATFORM=OS64
+cmake --build build-device --config Release
+
+cmake -S . -B build-simulator -G Xcode -DCMAKE_TOOLCHAIN_FILE=ios.toolchain.cmake -DPLATFORM=SIMULATOR64COMBINED
+cmake --build build-simulator --config Release
+
+xcodebuild -create-xcframework \
+  -library build-device/Release-iphoneos/libexample.a \
+  -library build-simulator/Release-iphonesimulator/libexample.a \
+  -output example.xcframework
+```
+
+CMake 3.28+ can consume xcframeworks directly via `find_library`, and if you distribute CMake packages,
+have a look at `generate_apple_platform_selection_file()` in the CMakePackageConfigHelpers module
+(CMake 3.29+) which solves the "one package for many Apple platforms" case properly.
+
+## COMBINED Options (DEPRECATED)
+
+The options called *COMBINED (OS64COMBINED, TVOSCOMBINED and WATCHOSCOMBINED) build FAT-libraries containing
+both device and simulator slices. **These options are deprecated** since the underlying CMake feature
+(`IOS_INSTALL_COMBINED`) was deprecated in CMake 3.28 and the produced libraries can not contain the arm64
+simulator slice (it gets stripped when the device slice is also arm64). Prefer the xcframework workflow above.
 
 Example:
 
@@ -62,7 +85,7 @@ cmake --build . --config Release
 cmake --install . --config Release # Necessary to build combined library
 ```
 
-**_NOTE_: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode) on CMake versions 3.14+!**
+**_NOTE_: The COMBINED options _ONLY_ work with the Xcode generator (-G Xcode)!**
 
 ---
 
@@ -78,7 +101,7 @@ cmake --install . --config Release # Necessary to build combined library
 
 ### Additional Options
 
-`-DENABLE_BITCODE=(BOOL)` - Disabled by default, specify TRUE or 1 to enable bitcode
+`-DENABLE_BITCODE=(BOOL)` - **REMOVED in 5.0** (Apple removed bitcode support in Xcode 14). The option is ignored with a warning.
 
 `-DENABLE_ARC=(BOOL)` - Enabled by default, specify FALSE or 0 to disable ARC
 
@@ -86,7 +109,7 @@ cmake --install . --config Release # Necessary to build combined library
 
 `-DENABLE_STRICT_TRY_COMPILE=(BOOL)` - Disabled by default, specify TRUE or 1 to enable strict compiler checks (will run linker on all compiler checks whenever needed)
 
-`-DARCHS=(STRING)` - Valid values are: armv7, armv7s, arm64, i386, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DPLATFORM` (see above)
+`-DARCHS=(STRING)` - Valid values are: arm64, x86_64, armv7k, arm64_32. By default it will build for all valid architectures based on `-DPLATFORM` (see above)
 
 __*To combine all platforms into the same FAT-library, either build any of the "*COMBINED*" platform types OR use the
 LIPO tool. More information on how to combine libraries with LIPO is readily available on the net.*__
