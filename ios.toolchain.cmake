@@ -97,8 +97,6 @@
 #    ON (default) = Will require "enable_language(OBJC) and/or enable_language(OBJCXX)" for full OBJC|OBJCXX support
 #    OFF = Will embed the OBJC and OBJCXX flags into the CMAKE_C_FLAGS and CMAKE_CXX_FLAGS (legacy behavior, CMake version < 3.16)
 #
-# ENABLE_BITCODE: (ON|OFF) Enables or disables bitcode support. Default OFF
-#
 # ENABLE_ARC: (ON|OFF) Enables or disables ARC support. Default ON (ARC enabled by default)
 #
 # ENABLE_VISIBILITY: (ON|OFF) Enables or disables symbol visibility support. Default OFF (visibility hidden by default)
@@ -236,12 +234,6 @@ endif()
 # This happens if CMake is invoked with the same command line the second time.
 if(CMAKE_TOOLCHAIN_FILE)
 endif()
-
-# Fix for PThread library not in path
-set(CMAKE_THREAD_LIBS_INIT "-lpthread")
-set(CMAKE_HAVE_THREADS_LIBRARY 1)
-set(CMAKE_USE_WIN32_THREADS_INIT 0)
-set(CMAKE_USE_PTHREADS_INIT 1)
 
 # Specify named language support defaults.
 if(NOT DEFINED NAMED_LANGUAGE_SUPPORT)
@@ -505,7 +497,6 @@ endif()
 string(REPLACE ";" " " ARCHS_SPACED "${ARCHS}")
 
 if(CMAKE_GENERATOR MATCHES "Xcode" AND PLATFORM_INT MATCHES "^MAC_CATALYST")
-  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
   set(CMAKE_XCODE_ATTRIBUTE_SUPPORTED_PLATFORMS "macosx")
   set(CMAKE_XCODE_ATTRIBUTE_SUPPORTS_MACCATALYST "YES")
   # Build the Mac Catalyst variant by default instead of plain macOS, so that the correct
@@ -514,17 +505,8 @@ if(CMAKE_GENERATOR MATCHES "Xcode" AND PLATFORM_INT MATCHES "^MAC_CATALYST")
   set(CMAKE_XCODE_ATTRIBUTE_SDK_VARIANT "iosmac")
   # The minimum version of a Catalyst build is driven by the iOS deployment target.
   set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${DEPLOYMENT_TARGET}")
-  if(NOT DEFINED MACOSX_DEPLOYMENT_TARGET)
-    set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.15")
-  else()
+  if(DEFINED MACOSX_DEPLOYMENT_TARGET)
     set(CMAKE_XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "${MACOSX_DEPLOYMENT_TARGET}")
-  endif()
-elseif(CMAKE_GENERATOR MATCHES "Xcode")
-  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-  set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET "${DEPLOYMENT_TARGET}")
-  if(NOT PLATFORM_INT MATCHES ".*COMBINED")
-    set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=${SDK_NAME}*] "${ARCHS_SPACED}")
-    set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=${SDK_NAME}*] "${ARCHS_SPACED}")
   endif()
 endif()
 
@@ -554,13 +536,10 @@ elseif(DEFINED CMAKE_OSX_SYSROOT_INT)
   set(CMAKE_OSX_SYSROOT "${CMAKE_OSX_SYSROOT_INT}" CACHE INTERNAL "")
 endif()
 
-# Use bitcode or not
-if(NOT DEFINED ENABLE_BITCODE)
-  message(STATUS "[DEFAULTS] Disabling bitcode support by default. ENABLE_BITCODE not provided for override!")
-  set(ENABLE_BITCODE OFF)
+# Bitcode support was removed by Apple in Xcode 14, and with it from this toolchain.
+if(ENABLE_BITCODE)
+  message(WARNING "Apple removed bitcode support in Xcode 14 and the ENABLE_BITCODE option was removed in toolchain 5.0. The option is ignored.")
 endif()
-set(ENABLE_BITCODE_INT ${ENABLE_BITCODE} CACHE BOOL
-        "Whether or not to enable bitcode" FORCE)
 # Use ARC or not
 if(NOT DEFINED ENABLE_ARC)
   # Unless specified, enable ARC support by default
@@ -609,64 +588,9 @@ if (NOT DEFINED CMAKE_DEVELOPER_ROOT AND NOT CMAKE_GENERATOR MATCHES "Xcode")
   endif()
 endif()
 
-# Find the C & C++ compilers for the specified SDK.
-if(DEFINED CMAKE_C_COMPILER)
-  # Environment variables are always preserved.
-  set(ENV{_CMAKE_C_COMPILER} "${CMAKE_C_COMPILER}")
-elseif(DEFINED ENV{_CMAKE_C_COMPILER})
-  set(CMAKE_C_COMPILER "$ENV{_CMAKE_C_COMPILER}")
-  set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
-elseif(NOT DEFINED CMAKE_C_COMPILER)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find clang
-          OUTPUT_VARIABLE CMAKE_C_COMPILER
-          ERROR_QUIET
-          OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set(CMAKE_ASM_COMPILER ${CMAKE_C_COMPILER})
-endif()
-if(DEFINED CMAKE_CXX_COMPILER)
-  # Environment variables are always preserved.
-  set(ENV{_CMAKE_CXX_COMPILER} "${CMAKE_CXX_COMPILER}")
-elseif(DEFINED ENV{_CMAKE_CXX_COMPILER})
-  set(CMAKE_CXX_COMPILER "$ENV{_CMAKE_CXX_COMPILER}")
-elseif(NOT DEFINED CMAKE_CXX_COMPILER)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find clang++
-          OUTPUT_VARIABLE CMAKE_CXX_COMPILER
-          ERROR_QUIET
-          OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-# Find (Apple's) libtool.
-if(DEFINED BUILD_LIBTOOL)
-  # Environment variables are always preserved.
-  set(ENV{_BUILD_LIBTOOL} "${BUILD_LIBTOOL}")
-elseif(DEFINED ENV{_BUILD_LIBTOOL})
-  set(BUILD_LIBTOOL "$ENV{_BUILD_LIBTOOL}")
-elseif(NOT DEFINED BUILD_LIBTOOL)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find libtool
-          OUTPUT_VARIABLE BUILD_LIBTOOL
-          ERROR_QUIET
-          OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif()
-# Find the toolchain's provided install_name_tool if none is found on the host
-if(DEFINED CMAKE_INSTALL_NAME_TOOL)
-  # Environment variables are always preserved.
-  set(ENV{_CMAKE_INSTALL_NAME_TOOL} "${CMAKE_INSTALL_NAME_TOOL}")
-elseif(DEFINED ENV{_CMAKE_INSTALL_NAME_TOOL})
-  set(CMAKE_INSTALL_NAME_TOOL "$ENV{_CMAKE_INSTALL_NAME_TOOL}")
-elseif(NOT DEFINED CMAKE_INSTALL_NAME_TOOL)
-  execute_process(COMMAND xcrun -sdk ${CMAKE_OSX_SYSROOT_INT} -find install_name_tool
-          OUTPUT_VARIABLE CMAKE_INSTALL_NAME_TOOL_INT
-          ERROR_QUIET
-          OUTPUT_STRIP_TRAILING_WHITESPACE)
-  set(CMAKE_INSTALL_NAME_TOOL ${CMAKE_INSTALL_NAME_TOOL_INT} CACHE INTERNAL "")
-endif()
-
-# Configure libtool to be used instead of ar + ranlib to build static libraries.
-# This is required on Xcode 7+, but should also work on previous versions of
-# Xcode.
+# NOTE: The compilers, libtool, install_name_tool and the static-library archiver are all
+# located by CMake itself nowadays, so this toolchain no longer sets them explicitly.
 get_property(languages GLOBAL PROPERTY ENABLED_LANGUAGES)
-foreach(lang ${languages})
-  set(CMAKE_${lang}_CREATE_STATIC_LIBRARY "${BUILD_LIBTOOL} -static -o <TARGET> <LINK_FLAGS> <OBJECTS> " CACHE INTERNAL "")
-endforeach()
 
 # CMake supports building for all the Apple platforms out of the box, given the correct CMAKE_SYSTEM_NAME.
 if(SDK_NAME MATCHES "iphone")
@@ -701,8 +625,6 @@ if(PLATFORM_INT MATCHES ".*COMBINED")
 endif()
 # Standard settings.
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
-set(UNIX ON CACHE BOOL "")
-set(APPLE ON CACHE BOOL "")
 if(PLATFORM STREQUAL "MAC" OR PLATFORM STREQUAL "MAC_ARM64" OR PLATFORM STREQUAL "MAC_UNIVERSAL")
   set(IOS OFF CACHE BOOL "")
   set(MACOS ON CACHE BOOL "")
@@ -721,39 +643,16 @@ set(CMAKE_OSX_ARCHITECTURES ${ARCHS} CACHE INTERNAL "")
 if(NOT ENABLE_STRICT_TRY_COMPILE_INT)
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 endif()
-# All iOS/Darwin specific settings - some may be redundant.
-if (NOT DEFINED CMAKE_MACOSX_BUNDLE)
-  set(CMAKE_MACOSX_BUNDLE YES)
-endif()
+# NOTE: The library prefixes/suffixes, ABI details, version flags and bundle defaults that used to
+# be redefined here are all provided by CMake's own Darwin platform files nowadays.
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO")
 set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED "NO")
-set(CMAKE_SHARED_LIBRARY_PREFIX "lib")
-set(CMAKE_SHARED_LIBRARY_SUFFIX ".dylib")
-set(CMAKE_EXTRA_SHARED_LIBRARY_SUFFIXES ".tbd" ".so")
-set(CMAKE_SHARED_MODULE_PREFIX "lib")
-set(CMAKE_SHARED_MODULE_SUFFIX ".so")
-set(CMAKE_C_COMPILER_ABI ELF)
-set(CMAKE_CXX_COMPILER_ABI ELF)
-set(CMAKE_C_HAS_ISYSROOT 1)
-set(CMAKE_CXX_HAS_ISYSROOT 1)
-set(CMAKE_MODULE_EXISTS 1)
-set(CMAKE_DL_LIBS "")
-set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
-set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
-set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
-set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
 
-if(ARCHS MATCHES "((^|;|, )(arm64|arm64e|x86_64))+")
-  set(CMAKE_C_SIZEOF_DATA_PTR 8)
-  set(CMAKE_CXX_SIZEOF_DATA_PTR 8)
-  if(ARCHS MATCHES "((^|;|, )(arm64|arm64e))+")
-    set(CMAKE_SYSTEM_PROCESSOR "aarch64")
-  else()
-    set(CMAKE_SYSTEM_PROCESSOR "x86_64")
-  endif()
+if(ARCHS MATCHES "((^|;|, )(arm64|arm64e))+")
+  set(CMAKE_SYSTEM_PROCESSOR "aarch64")
+elseif(ARCHS MATCHES "((^|;|, )(x86_64))+")
+  set(CMAKE_SYSTEM_PROCESSOR "x86_64")
 else()
-  set(CMAKE_C_SIZEOF_DATA_PTR 4)
-  set(CMAKE_CXX_SIZEOF_DATA_PTR 4)
   set(CMAKE_SYSTEM_PROCESSOR "arm")
 endif()
 
@@ -773,15 +672,6 @@ endif()
 
 if(PLATFORM_INT MATCHES "^MAC_CATALYST")
   set(C_TARGET_FLAGS "-isystem ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/usr/include -iframework ${CMAKE_OSX_SYSROOT_INT}/System/iOSSupport/System/Library/Frameworks")
-endif()
-
-if(ENABLE_BITCODE_INT)
-  set(BITCODE "-fembed-bitcode")
-  set(CMAKE_XCODE_ATTRIBUTE_BITCODE_GENERATION_MODE "bitcode")
-  set(CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE "YES")
-else()
-  set(BITCODE "")
-  set(CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE "NO")
 endif()
 
 if(ENABLE_ARC_INT)
@@ -822,35 +712,19 @@ endif()
 if(CMAKE_GENERATOR MATCHES "Xcode")
   message(STATUS "Not setting any manual command-line buildflags, since Xcode is selected as the generator. Modifying the Xcode build-settings directly instead.")
 else()
-  set(CMAKE_C_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${OBJC_LEGACY_VARS} ${BITCODE} ${VISIBILITY} ${CMAKE_C_FLAGS}" CACHE INTERNAL
+  set(CMAKE_C_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${OBJC_LEGACY_VARS} ${VISIBILITY} ${CMAKE_C_FLAGS}" CACHE INTERNAL
      "Flags used by the compiler during all C build types.")
-  set(CMAKE_C_FLAGS_DEBUG "-O0 -g ${CMAKE_C_FLAGS_DEBUG}")
-  set(CMAKE_C_FLAGS_MINSIZEREL "-DNDEBUG -Os ${CMAKE_C_FLAGS_MINSIZEREL}")
-  set(CMAKE_C_FLAGS_RELWITHDEBINFO "-DNDEBUG -O2 -g ${CMAKE_C_FLAGS_RELWITHDEBINFO}")
-  set(CMAKE_C_FLAGS_RELEASE "-DNDEBUG -O3 ${CMAKE_C_FLAGS_RELEASE}")
-  set(CMAKE_CXX_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${OBJC_LEGACY_VARS} ${BITCODE} ${VISIBILITY} ${CMAKE_CXX_FLAGS}" CACHE INTERNAL
+  set(CMAKE_CXX_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${OBJC_LEGACY_VARS} ${VISIBILITY} ${CMAKE_CXX_FLAGS}" CACHE INTERNAL
      "Flags used by the compiler during all CXX build types.")
-  set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g ${CMAKE_CXX_FLAGS_DEBUG}")
-  set(CMAKE_CXX_FLAGS_MINSIZEREL "-DNDEBUG -Os ${CMAKE_CXX_FLAGS_MINSIZEREL}")
-  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -O2 -g ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-  set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -O3 ${CMAKE_CXX_FLAGS_RELEASE}")
   if(NAMED_LANGUAGE_SUPPORT_INT)
-    set(CMAKE_OBJC_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${BITCODE} ${VISIBILITY} ${FOBJC_ARC} ${OBJC_VARS} ${CMAKE_OBJC_FLAGS}" CACHE INTERNAL
+    set(CMAKE_OBJC_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${VISIBILITY} ${FOBJC_ARC} ${OBJC_VARS} ${CMAKE_OBJC_FLAGS}" CACHE INTERNAL
      "Flags used by the compiler during all OBJC build types.")
-    set(CMAKE_OBJC_FLAGS_DEBUG "-O0 -g ${CMAKE_OBJC_FLAGS_DEBUG}")
-    set(CMAKE_OBJC_FLAGS_MINSIZEREL "-DNDEBUG -Os ${CMAKE_OBJC_FLAGS_MINSIZEREL}")
-    set(CMAKE_OBJC_FLAGS_RELWITHDEBINFO "-DNDEBUG -O2 -g ${CMAKE_OBJC_FLAGS_RELWITHDEBINFO}")
-    set(CMAKE_OBJC_FLAGS_RELEASE "-DNDEBUG -O3 ${CMAKE_OBJC_FLAGS_RELEASE}")
-    set(CMAKE_OBJCXX_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${BITCODE} ${VISIBILITY} ${FOBJC_ARC} ${OBJC_VARS} ${CMAKE_OBJCXX_FLAGS}" CACHE INTERNAL
+    set(CMAKE_OBJCXX_FLAGS "${C_TARGET_FLAGS} ${APPLE_TARGET_TRIPLE_FLAG} ${VISIBILITY} ${FOBJC_ARC} ${OBJC_VARS} ${CMAKE_OBJCXX_FLAGS}" CACHE INTERNAL
      "Flags used by the compiler during all OBJCXX build types.")
-    set(CMAKE_OBJCXX_FLAGS_DEBUG "-O0 -g ${CMAKE_OBJCXX_FLAGS_DEBUG}")
-    set(CMAKE_OBJCXX_FLAGS_MINSIZEREL "-DNDEBUG -Os ${CMAKE_OBJCXX_FLAGS_MINSIZEREL}")
-    set(CMAKE_OBJCXX_FLAGS_RELWITHDEBINFO "-DNDEBUG -O2 -g ${CMAKE_OBJCXX_FLAGS_RELWITHDEBINFO}")
-    set(CMAKE_OBJCXX_FLAGS_RELEASE "-DNDEBUG -O3 ${CMAKE_OBJCXX_FLAGS_RELEASE}")
   endif()
   set(CMAKE_C_LINK_FLAGS "${C_TARGET_FLAGS} -Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}" CACHE INTERNAL
      "Flags used by the compiler for all C link types.")
-  set(CMAKE_CXX_LINK_FLAGS "${C_TARGET_FLAGS}  -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}" CACHE INTERNAL
+  set(CMAKE_CXX_LINK_FLAGS "${C_TARGET_FLAGS} -Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}" CACHE INTERNAL
      "Flags used by the compiler for all CXX link types.")
   if(NAMED_LANGUAGE_SUPPORT_INT)
     set(CMAKE_OBJC_LINK_FLAGS "${C_TARGET_FLAGS} -Wl,-search_paths_first ${CMAKE_OBJC_LINK_FLAGS}" CACHE INTERNAL
@@ -865,10 +739,6 @@ endif()
 ## Print status messages to inform of the current state
 message(STATUS "Configuring ${SDK_NAME} build for platform: ${PLATFORM_INT}, architecture(s): ${ARCHS}")
 message(STATUS "Using SDK: ${CMAKE_OSX_SYSROOT_INT}")
-message(STATUS "Using C compiler: ${CMAKE_C_COMPILER}")
-message(STATUS "Using CXX compiler: ${CMAKE_CXX_COMPILER}")
-message(STATUS "Using libtool: ${BUILD_LIBTOOL}")
-message(STATUS "Using install name tool: ${CMAKE_INSTALL_NAME_TOOL}")
 if(DEFINED APPLE_TARGET_TRIPLE)
   message(STATUS "Autoconf target triple: ${APPLE_TARGET_TRIPLE}")
 endif()
@@ -881,12 +751,6 @@ if(CMAKE_GENERATOR MATCHES "Xcode")
   message(STATUS "Using Xcode version: ${XCODE_VERSION_INT}")
 endif()
 message(STATUS "CMake version: ${CMAKE_VERSION}")
-if(ENABLE_BITCODE_INT)
-  message(STATUS "Bitcode: Enabled")
-else()
-  message(STATUS "Bitcode: Disabled")
-endif()
-
 if(ENABLE_ARC_INT)
   message(STATUS "ARC: Enabled")
 else()
@@ -915,25 +779,11 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
         DEPLOYMENT_TARGET
         CMAKE_DEVELOPER_ROOT
         CMAKE_OSX_SYSROOT_INT
-        ENABLE_BITCODE
         ENABLE_ARC
-        CMAKE_ASM_COMPILER
-        CMAKE_C_COMPILER
         CMAKE_C_COMPILER_TARGET
-        CMAKE_CXX_COMPILER
         CMAKE_CXX_COMPILER_TARGET
-        BUILD_LIBTOOL
-        CMAKE_INSTALL_NAME_TOOL
         CMAKE_C_FLAGS
-        CMAKE_C_DEBUG
-        CMAKE_C_MINSIZEREL
-        CMAKE_C_RELWITHDEBINFO
-        CMAKE_C_RELEASE
         CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_MINSIZEREL
-        CMAKE_CXX_FLAGS_RELWITHDEBINFO
-        CMAKE_CXX_FLAGS_RELEASE
         CMAKE_C_LINK_FLAGS
         CMAKE_CXX_LINK_FLAGS
         CMAKE_ASM_FLAGS
@@ -942,42 +792,20 @@ set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
 if(NAMED_LANGUAGE_SUPPORT_INT)
   list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
         CMAKE_OBJC_FLAGS
-        CMAKE_OBJC_DEBUG
-        CMAKE_OBJC_MINSIZEREL
-        CMAKE_OBJC_RELWITHDEBINFO
-        CMAKE_OBJC_RELEASE
         CMAKE_OBJCXX_FLAGS
-        CMAKE_OBJCXX_DEBUG
-        CMAKE_OBJCXX_MINSIZEREL
-        CMAKE_OBJCXX_RELWITHDEBINFO
-        CMAKE_OBJCXX_RELEASE
         CMAKE_OBJC_LINK_FLAGS
         CMAKE_OBJCXX_LINK_FLAGS
   )
 endif()
 
-set(CMAKE_PLATFORM_HAS_INSTALLNAME 1)
 set(CMAKE_SHARED_LINKER_FLAGS "-rpath @executable_path/Frameworks -rpath @loader_path/Frameworks")
-set(CMAKE_SHARED_LIBRARY_CREATE_C_FLAGS "-dynamiclib -Wl,-headerpad_max_install_names")
-set(CMAKE_SHARED_MODULE_CREATE_C_FLAGS "-bundle -Wl,-headerpad_max_install_names")
-set(CMAKE_SHARED_MODULE_LOADER_C_FLAG "-Wl,-bundle_loader,")
-set(CMAKE_SHARED_MODULE_LOADER_CXX_FLAG "-Wl,-bundle_loader,")
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".tbd" ".dylib" ".so" ".a")
-set(CMAKE_SHARED_LIBRARY_SONAME_C_FLAG "-install_name")
 
-# Set the find root to the SDK developer roots.
-# Note: CMAKE_FIND_ROOT_PATH is only useful when cross-compiling. Thus, do not set on macOS builds.
+# Keep host package managers out of cross-compiled find results.
+# NOTE: CMake appends the SDK to CMAKE_FIND_ROOT_PATH itself and defaults the
+# CMAKE_FIND_ROOT_PATH_MODE_* variables to sane values for the embedded platforms.
 if(NOT PLATFORM_INT MATCHES "^MAC.*$")
-  list(APPEND CMAKE_FIND_ROOT_PATH "${CMAKE_OSX_SYSROOT_INT}")
-  list(REMOVE_DUPLICATES CMAKE_FIND_ROOT_PATH)
-  set(CMAKE_FIND_ROOT_PATH "${CMAKE_FIND_ROOT_PATH}" CACHE INTERNAL "")
   set(CMAKE_IGNORE_PATH "/System/Library/Frameworks;/usr/local/lib;/opt/homebrew" CACHE INTERNAL "")
 endif()
-
-# Default to searching for frameworks first.
-IF(NOT DEFINED CMAKE_FIND_FRAMEWORK)
-  set(CMAKE_FIND_FRAMEWORK FIRST)
-ENDIF(NOT DEFINED CMAKE_FIND_FRAMEWORK)
 
 # Set up the default search directories for frameworks.
 if(PLATFORM_INT MATCHES "^MAC_CATALYST")
@@ -991,20 +819,6 @@ else()
           ${CMAKE_DEVELOPER_ROOT}/Library/PrivateFrameworks
           ${CMAKE_OSX_SYSROOT_INT}/System/Library/Frameworks
           ${CMAKE_FRAMEWORK_PATH} CACHE INTERNAL "")
-endif()
-
-# By default, search both the specified iOS SDK and the remainder of the host filesystem.
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_PROGRAM)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH CACHE INTERNAL "")
-endif()
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_LIBRARY)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH CACHE INTERNAL "")
-endif()
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_INCLUDE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH CACHE INTERNAL "")
-endif()
-if(NOT CMAKE_FIND_ROOT_PATH_MODE_PACKAGE)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH CACHE INTERNAL "")
 endif()
 
 #
@@ -1023,16 +837,16 @@ endmacro(set_xcode_property)
 
 # This macro lets you find executable programs on the host system.
 macro(find_host_package)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY NEVER)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE NEVER)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE NEVER)
+  foreach(_mode PROGRAM LIBRARY INCLUDE PACKAGE)
+    set(_SAVED_FIND_ROOT_PATH_MODE_${_mode} "${CMAKE_FIND_ROOT_PATH_MODE_${_mode}}")
+    set(CMAKE_FIND_ROOT_PATH_MODE_${_mode} NEVER)
+  endforeach()
   set(_TOOLCHAIN_IOS ${IOS})
   set(IOS OFF)
   find_package(${ARGN})
   set(IOS ${_TOOLCHAIN_IOS})
-  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM BOTH)
-  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH)
-  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)
-  set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH)
+  foreach(_mode PROGRAM LIBRARY INCLUDE PACKAGE)
+    set(CMAKE_FIND_ROOT_PATH_MODE_${_mode} "${_SAVED_FIND_ROOT_PATH_MODE_${_mode}}")
+    unset(_SAVED_FIND_ROOT_PATH_MODE_${_mode})
+  endforeach()
 endmacro(find_host_package)
