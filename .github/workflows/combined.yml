@@ -16,69 +16,69 @@ jobs:
       DEPLOYMENT_TARGET: 14.0
       USE_XCODE: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: 'latest-stable'
     - name: Build
       run: ./.github/build.sh
-  build_with_15_0_1_WATCHOSCOMBINED:
-    name: "Xcode version 15.0.1, Target watchOS Combined [armv7k, arm64_32, x86_64] Target SDK 8.0"
-    runs-on: macos-13
+  build_with_16_4_WATCHOSCOMBINED:
+    name: "Xcode version 16.4, Target watchOS Combined [arm64, armv7k, arm64_32, x86_64] Target SDK 8.0"
+    runs-on: macos-15
     env:
       PLATFORM: WATCHOSCOMBINED
       USE_NEW_BUILD: 1
       DEPLOYMENT_TARGET: 8.0
       USE_XCODE: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.1'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh
-  build_with_15_0_1_SIMULATOR_WATCHOSCOMBINED:
-    name: "Xcode version 15.0.1, Target watchOS Simulator Combined [arm64, x86_64] Target SDK 10.0"
-    runs-on: macos-13
+  build_with_16_4_SIMULATOR_WATCHOSCOMBINED:
+    name: "Xcode version 16.4, Target watchOS Simulator Combined [arm64, x86_64] Target SDK 10.0"
+    runs-on: macos-15
     env:
       PLATFORM: SIMULATOR_WATCHOSCOMBINED
       USE_NEW_BUILD: 1
       DEPLOYMENT_TARGET: 10.0
       USE_XCODE: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.1'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh
-  build_with_15_0_1_TVOSCOMBINED:
-    name: "Xcode version 15.0.1, Target tvOS Combined [arm64, x86_64] Target SDK 16.0"
-    runs-on: macos-13
+  build_with_16_4_TVOSCOMBINED:
+    name: "Xcode version 16.4, Target tvOS Combined [arm64, x86_64] Target SDK 16.0"
+    runs-on: macos-15
     env:
       PLATFORM: TVOSCOMBINED
       USE_NEW_BUILD: 1
       DEPLOYMENT_TARGET: 16.0
       USE_XCODE: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.1'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh
-  build_with_15_0_1_OS64_LIBCURL:
-    name: "Xcode version 15.0.1, Target iOS [arm64, x86_64] Target SDK 17.0 [libCURL example]"
-    runs-on: macos-13
+  build_with_16_4_OS64_LIBCURL:
+    name: "Xcode version 16.4, Target iOS [arm64, x86_64] Target SDK 17.0 [libCURL example]"
+    runs-on: macos-15
     env:
       PLATFORM: OS64COMBINED
       DEPLOYMENT_TARGET: 17.0
       USE_XCODE: 1
       BUILD_CURL: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.1'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh

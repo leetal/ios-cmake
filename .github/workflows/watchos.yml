@@ -7,42 +7,42 @@ on:
     types: [ opened, synchronize ]
 
 jobs:
-  build_with_15_4_WATCHOS:
-    name: "Xcode version 15.4, Target watchOS [armv7k, arm64_32] Target SDK 10.5"
-    runs-on: macos-14
+  build_with_16_4_WATCHOS:
+    name: "Xcode version 16.4, Target watchOS [arm64, armv7k, arm64_32] Target SDK 10.5"
+    runs-on: macos-15
     env:
       PLATFORM: WATCHOS
       DEPLOYMENT_TARGET: 10.5
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.4'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh
-  build_with_15_0_1_SIMULATOR_WATCHOS:
-    name: "Xcode version 15.0.1, Target watchOS Simulator [x86_64] Target SDK 10.0"
-    runs-on: macos-13
+  build_with_16_4_SIMULATOR_WATCHOS:
+    name: "Xcode version 16.4, Target watchOS Simulator [x86_64] Target SDK 10.0"
+    runs-on: macos-15
     env:
       PLATFORM: SIMULATOR_WATCHOS
       DEPLOYMENT_TARGET: 10.0
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.1'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh
-  build_with_15_0_1_SIMULATORARM64_WATCHOS:
-    name: "Xcode version 15.0.1, Target watchOS Simulator [arm64] Target SDK 10.0"
-    runs-on: macos-13
+  build_with_16_4_SIMULATORARM64_WATCHOS:
+    name: "Xcode version 16.4, Target watchOS Simulator [arm64] Target SDK 10.0"
+    runs-on: macos-15
     env:
       PLATFORM: SIMULATORARM64_WATCHOS
       DEPLOYMENT_TARGET: 10.0
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '15.0.1'
+        xcode-version: '16.4'
     - name: Build
       run: ./.github/build.sh
