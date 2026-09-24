@@ -100,7 +100,7 @@ All options are passed on the CMake command line, e.g. `-DDEPLOYMENT_TARGET=15.0
 
 | Option | Default | Description |
 |---|---|---|
-| `DEPLOYMENT_TARGET` | 13.0 iOS/tvOS, 6.0 watchOS, 1.0 visionOS, 11.0 macOS, 13.1 Catalyst | Minimum OS version to target |
+| `DEPLOYMENT_TARGET` | Xcode 27+: 15.0 iOS/tvOS, 9.0 watchOS, 1.0 visionOS, 12.0 macOS, 15.0 Catalyst<br>Older Xcode: 13.0 iOS/tvOS, 6.0 watchOS, 1.0 visionOS, 11.0 macOS, 13.1 Catalyst | Minimum OS version to target |
 | `ARCHS` | per PLATFORM, see above | Semicolon separated architecture override, e.g. `-DARCHS="arm64;x86_64"` |
 | `ENABLE_ARC` | ON | Objective-C automatic reference counting |
 | `ENABLE_VISIBILITY` | OFF | OFF hides symbols (`-fvisibility=hidden`), ON keeps them visible |
