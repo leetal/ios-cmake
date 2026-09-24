@@ -52,7 +52,7 @@ Pass exactly one of these as `-DPLATFORM=<value>`:
 | `SIMULATOR64` | iOS Simulator on Intel Macs | x86_64 |
 | `SIMULATORARM64` | iOS Simulator on Apple Silicon | arm64 |
 | `SIMULATOR64COMBINED` | iOS Simulator, fat library | arm64, x86_64 |
-| `OS64COMBINED` | iOS devices + Simulator, fat library (see note below) | arm64, x86_64 |
+| `OS64COMBINED` | iOS devices + Simulator, fat library (deprecated, see note below) | arm64, x86_64 |
 
 ### tvOS
 
@@ -61,7 +61,7 @@ Pass exactly one of these as `-DPLATFORM=<value>`:
 | `TVOS` | Apple TV devices | arm64 |
 | `SIMULATOR_TVOS` | tvOS Simulator on Intel Macs | x86_64 |
 | `SIMULATORARM64_TVOS` | tvOS Simulator on Apple Silicon | arm64 |
-| `TVOSCOMBINED` | Apple TV devices + Simulator, fat library (see note below) | arm64, x86_64 |
+| `TVOSCOMBINED` | Apple TV devices + Simulator, fat library (deprecated, see note below) | arm64, x86_64 |
 
 ### watchOS
 
@@ -71,7 +71,7 @@ Pass exactly one of these as `-DPLATFORM=<value>`:
 | `SIMULATOR_WATCHOS` | watchOS Simulator on Intel Macs | x86_64 |
 | `SIMULATORARM64_WATCHOS` | watchOS Simulator on Apple Silicon | arm64 |
 | `SIMULATOR_WATCHOSCOMBINED` | watchOS Simulator, fat library | arm64, x86_64 |
-| `WATCHOSCOMBINED` | Apple Watch devices + Simulator, fat library (see note below) | arm64, armv7k, arm64_32, x86_64 |
+| `WATCHOSCOMBINED` | Apple Watch devices + Simulator, fat library (deprecated, see note below) | arm64, armv7k, arm64_32, x86_64 |
 
 The `arm64` slice for watchOS devices is included when building with Xcode 15 or later. Apple requires arm64 support in watchOS apps submitted from April 2026.
 
@@ -81,7 +81,7 @@ The `arm64` slice for watchOS devices is included when building with Xcode 15 or
 |---|---|---|
 | `VISIONOS` | Apple Vision Pro | arm64 |
 | `SIMULATOR_VISIONOS` | visionOS Simulator | arm64 |
-| `VISIONOSCOMBINED` | Vision Pro + Simulator, fat library (see note below) | arm64 |
+| `VISIONOSCOMBINED` | Vision Pro + Simulator, fat library (deprecated, see note below) | arm64 |
 
 ### macOS and Mac Catalyst
 
@@ -105,7 +105,7 @@ All options are passed on the CMake command line, e.g. `-DDEPLOYMENT_TARGET=15.0
 | `ENABLE_ARC` | ON | Objective-C automatic reference counting |
 | `ENABLE_VISIBILITY` | OFF | OFF hides symbols (`-fvisibility=hidden`), ON keeps them visible |
 | `ENABLE_STRICT_TRY_COMPILE` | OFF | ON makes `try_compile()` link for real, so link dependent checks (e.g. `HAVE_LIBATOMIC`) give correct answers |
-| `ENABLE_BITCODE` | OFF | Bitcode; dead since Xcode 14, leave it off |
+| `ENABLE_BITCODE` | | **Removed in 5.0** (Apple removed bitcode in Xcode 14). The option is ignored with a warning |
 | `NAMED_LANGUAGE_SUPPORT` | ON | Use `enable_language(OBJC)`/`enable_language(OBJCXX)` for Objective-C sources |
 
 ## Distributing for device + simulator: use an xcframework
@@ -127,7 +127,7 @@ xcodebuild -create-xcframework \
 
 CMake 3.28+ can consume xcframeworks directly via `find_library`, and if you distribute CMake packages, have a look at `generate_apple_platform_selection_file()` in the CMakePackageConfigHelpers module (CMake 3.29+).
 
-The `*COMBINED` platform options still exist and build device + simulator fat libraries through `cmake --install`, but due to the arm64 slice conflict above they are not recommended for distribution anymore. They only work with the Xcode generator.
+The `*COMBINED` platform options are **deprecated** and will be removed in a future release. The underlying CMake feature (`IOS_INSTALL_COMBINED`) was deprecated in CMake 3.28, and due to the arm64 slice conflict above the produced libraries cannot contain the arm64 simulator slice. They still build device + simulator fat libraries through `cmake --install` (Xcode generator only), but print a deprecation warning. Prefer the xcframework workflow above.
 
 ## Code signing
 
@@ -162,7 +162,7 @@ cmake -B build -G Xcode -DCMAKE_TOOLCHAIN_FILE=ios.toolchain.cmake -DPLATFORM=OS
 
 **A configure check found a library that does not exist on iOS** (e.g. `HAVE_LIBATOMIC`). Configure checks do not link by default. Pass `-DENABLE_STRICT_TRY_COMPILE=ON`.
 
-**CMake picked up a Homebrew library for my iOS build.** The toolchain filters the common Homebrew paths, but you can lock it down completely with `-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY`.
+**CMake picked up a Homebrew library for my iOS build.** Since 5.0 the toolchain leaves `CMAKE_FIND_ROOT_PATH_MODE_LIBRARY/INCLUDE/PACKAGE` at CMake's default for the embedded platforms (`ONLY`), so find calls only search the SDK, and the common Homebrew paths are ignored as well. If you set these modes to `BOTH` (the pre 5.0 behavior), host libraries can leak into the results again.
 
 **Different source files per architecture in a COMBINED build?** Not possible, CMake configures once for all archs. Use the Xcode build settings `EXCLUDED_SOURCE_FILE_NAMES`/`INCLUDED_SOURCE_FILE_NAMES` with `$(CURRENT_ARCH)`, or build each arch separately.
 
