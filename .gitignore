@@ -1,6 +1,9 @@
 # Project specific
 .DS_Store
 
+# Installed output from example/example-lib, consumed by example/example-app
+example/example-app/example-lib/
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore

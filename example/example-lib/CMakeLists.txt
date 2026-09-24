@@ -4,6 +4,7 @@ enable_testing()
 
 enable_language(CXX)
 enable_language(OBJC)
+enable_language(OBJCXX)
 
 MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
 MESSAGE( STATUS "CMAKE_OBJC_FLAGS: " ${CMAKE_OBJC_FLAGS} )
@@ -38,11 +39,10 @@ else()
   message(STATUS "UIKit.framework found! ${UIKIT_LIBRARY}")
 endif()
 
-# Hook up XCTest for the supported plaforms (all but WatchOS)
+# Hook up XCTest for the supported platforms (all but watchOS)
 if(NOT PLATFORM MATCHES ".*WATCHOS.*")
-  # Use the standard find_package, broken between 3.14.0 and 3.14.4 at least for XCtest...
   find_package(XCTest)
-  # Fallback: Try to find XCtest as host package via toochain macro (should always work)
+  # Fallback: Try to find XCTest as a host package via the toolchain macro (should always work)
   find_host_package(XCTest REQUIRED)
 endif()
 
@@ -115,6 +115,10 @@ if(PLATFORM MATCHES "MAC.*")
 
   install(CODE "include(BundleUtilities)
     fixup_bundle(\"${APPS}\" \"\" \"${DIRS}\")")
+
+  # fixup_bundle rewrites install names, which invalidates the (ad-hoc) code signature.
+  # Re-sign so the installed app can actually be launched.
+  install(CODE "execute_process(COMMAND codesign --force --deep --sign - \"${APPS}\")")
 
   set(CPACK_GENERATOR "DRAGNDROP")
   include(CPack)
