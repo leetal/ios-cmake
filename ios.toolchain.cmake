@@ -91,7 +91,9 @@
 #    CMAKE_OSX_SYSROOT, but can also be manually specified (although this should
 #    not be required).
 #
-# DEPLOYMENT_TARGET: Minimum SDK version to target. Default 6.0 on watchOS, 13.0 on tvOS+iOS/iPadOS, 11.0 on macOS, 1.0 on visionOS
+# DEPLOYMENT_TARGET: Minimum SDK version to target. The default depends on the Xcode version in use:
+#    Xcode 27+ = 15.0 on tvOS+iOS/iPadOS, 9.0 on watchOS, 12.0 on macOS, 15.0 on Mac Catalyst, 1.0 on visionOS
+#    Older     = 13.0 on tvOS+iOS/iPadOS, 6.0 on watchOS, 11.0 on macOS, 13.1 on Mac Catalyst, 1.0 on visionOS
 #
 # NAMED_LANGUAGE_SUPPORT:
 #    ON (default) = Will require "enable_language(OBJC) and/or enable_language(OBJCXX)" for full OBJC|OBJCXX support
@@ -243,29 +245,48 @@ endif()
 set(NAMED_LANGUAGE_SUPPORT_INT ${NAMED_LANGUAGE_SUPPORT} CACHE BOOL
         "Whether or not to enable explicit named language support" FORCE)
 
+# Default minimum versions of the deployment target. These depend on the Xcode version in use, since each Xcode
+# only accepts a certain range of deployment targets (Xcode 27 fails the build on anything below its range).
+if(XCODE_VERSION_INT VERSION_GREATER_EQUAL 27.0)
+  # The lowest deployment targets accepted by Xcode 27.
+  set(_default_target_ios "15.0")
+  set(_default_target_watchos "9.0")
+  # macOS 12.0 (Monterey)
+  set(_default_target_macos "12.0")
+  # Mac Catalyst 15.0 runs on macOS 12.0 (Monterey).
+  set(_default_target_catalyst "15.0")
+else()
+  set(_default_target_ios "13.0")
+  set(_default_target_watchos "6.0")
+  # macOS 11.0 (Big Sur)
+  set(_default_target_macos "11.0")
+  # Mac Catalyst 13.1 is the first Catalyst version.
+  set(_default_target_catalyst "13.1")
+endif()
+
 # Specify the minimum version of the deployment target.
 if(NOT DEFINED DEPLOYMENT_TARGET)
   if (PLATFORM MATCHES "WATCHOS")
-    # Unless specified, SDK version 6.0 is used by default as minimum target version (watchOS).
-    set(DEPLOYMENT_TARGET "6.0")
+    # Unless specified, the watchOS default is used as minimum target version (watchOS).
+    set(DEPLOYMENT_TARGET "${_default_target_watchos}")
   elseif(PLATFORM STREQUAL "MAC")
-    # Unless specified, SDK version 11.0 (Big Sur) is used by default as the minimum target version (macOS on x86).
-    set(DEPLOYMENT_TARGET "11.0")
+    # Unless specified, the macOS default is used as the minimum target version (macOS on x86).
+    set(DEPLOYMENT_TARGET "${_default_target_macos}")
   elseif(PLATFORM STREQUAL "VISIONOS" OR PLATFORM STREQUAL "SIMULATOR_VISIONOS" OR PLATFORM STREQUAL "VISIONOSCOMBINED")
     # Unless specified, SDK version 1.0 is used by default as minimum target version (visionOS).
     set(DEPLOYMENT_TARGET "1.0")
   elseif(PLATFORM STREQUAL "MAC_ARM64")
-    # Unless specified, SDK version 11.0 (Big Sur) is used by default as the minimum target version (macOS on arm).
-    set(DEPLOYMENT_TARGET "11.0")
+    # Unless specified, the macOS default is used as the minimum target version (macOS on arm).
+    set(DEPLOYMENT_TARGET "${_default_target_macos}")
   elseif(PLATFORM STREQUAL "MAC_UNIVERSAL")
-    # Unless specified, SDK version 11.0 (Big Sur) is used by default as minimum target version for universal builds.
-    set(DEPLOYMENT_TARGET "11.0")
+    # Unless specified, the macOS default is used as minimum target version for universal builds.
+    set(DEPLOYMENT_TARGET "${_default_target_macos}")
   elseif(PLATFORM STREQUAL "MAC_CATALYST" OR PLATFORM STREQUAL "MAC_CATALYST_ARM64" OR PLATFORM STREQUAL "MAC_CATALYST_UNIVERSAL")
-    # Unless specified, SDK version 13.1 is used by default as the minimum target version (mac catalyst minimum requirement).
-    set(DEPLOYMENT_TARGET "13.1")
+    # Unless specified, the Mac Catalyst default is used as the minimum target version (mac catalyst).
+    set(DEPLOYMENT_TARGET "${_default_target_catalyst}")
   else()
-    # Unless specified, SDK version 13.0 is used by default as the minimum target version (iOS, tvOS).
-    set(DEPLOYMENT_TARGET "13.0")
+    # Unless specified, the iOS default is used as the minimum target version (iOS, tvOS).
+    set(DEPLOYMENT_TARGET "${_default_target_ios}")
   endif()
   message(STATUS "[DEFAULTS] Using the default min-version since DEPLOYMENT_TARGET not provided!")
 elseif(DEFINED DEPLOYMENT_TARGET AND PLATFORM MATCHES "^MAC_CATALYST" AND ${DEPLOYMENT_TARGET} VERSION_LESS "13.1")
